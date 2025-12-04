@@ -44,7 +44,7 @@ const registrationSchema = z
             .min(8, "Password must be at least 8 characters")
             .regex(
                 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                "Password must contain uppercase, lowercase, number, and special character",
+                "Password must contain uppercase, lowercase, number, and special character"
             ),
         confirmPassword: z.string(),
         acceptTerms: z.boolean(),
@@ -89,7 +89,7 @@ export default function CompanyRegistration() {
             return { strength: "Medium", color: "text-yellow-500" };
         if (
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-                pwd,
+                pwd
             )
         )
             return { strength: "Strong", color: "text-green-500" };
@@ -129,7 +129,7 @@ export default function CompanyRegistration() {
             const res = await apiRequest(
                 "/api/auth/register-company-basic",
                 "POST",
-                data,
+                data
             );
             const response = await res.json();
 
@@ -220,8 +220,7 @@ export default function CompanyRegistration() {
                         <Button
                             onClick={() => setLocation("/login/admin")}
                             className="w-full bg-indigo-600 hover:bg-indigo-700"
-                            data-testid="button-go-to-login"
-                        >
+                            data-testid="button-go-to-login">
                             Go to Login
                         </Button>
                     </CardContent>
@@ -253,8 +252,7 @@ export default function CompanyRegistration() {
                                 className="w-full gap-2"
                                 onClick={handleGoogleSignIn}
                                 disabled={isLoading}
-                                data-testid="button-google-register"
-                            >
+                                data-testid="button-google-register">
                                 <SiGoogle className="h-5 w-5" />
                                 Register with Google
                             </Button>
@@ -275,8 +273,7 @@ export default function CompanyRegistration() {
                     <Form {...form}>
                         <form
                             onSubmit={form.handleSubmit(onSubmit)}
-                            className="space-y-4"
-                        >
+                            className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="companyName"
@@ -336,12 +333,11 @@ export default function CompanyRegistration() {
                                                     type="button"
                                                     onClick={() =>
                                                         setShowPassword(
-                                                            !showPassword,
+                                                            !showPassword
                                                         )
                                                     }
                                                     className="absolute right-3 top-1/2 -translate-y-1/2"
-                                                    data-testid="button-toggle-password"
-                                                >
+                                                    data-testid="button-toggle-password">
                                                     {showPassword ? (
                                                         <EyeOff className="h-4 w-4 text-gray-500" />
                                                     ) : (
@@ -352,8 +348,7 @@ export default function CompanyRegistration() {
                                         </FormControl>
                                         {password && (
                                             <p
-                                                className={`text-sm ${passwordStrength.color}`}
-                                            >
+                                                className={`text-sm ${passwordStrength.color}`}>
                                                 Strength:{" "}
                                                 {passwordStrength.strength}
                                             </p>
@@ -385,12 +380,11 @@ export default function CompanyRegistration() {
                                                     type="button"
                                                     onClick={() =>
                                                         setShowConfirmPassword(
-                                                            !showConfirmPassword,
+                                                            !showConfirmPassword
                                                         )
                                                     }
                                                     className="absolute right-3 top-1/2 -translate-y-1/2"
-                                                    data-testid="button-toggle-confirm-password"
-                                                >
+                                                    data-testid="button-toggle-confirm-password">
                                                     {showConfirmPassword ? (
                                                         <EyeOff className="h-4 w-4 text-gray-500" />
                                                     ) : (
@@ -421,8 +415,7 @@ export default function CompanyRegistration() {
                                                 I accept the{" "}
                                                 <a
                                                     href="#"
-                                                    className="text-indigo-600 hover:underline"
-                                                >
+                                                    className="text-indigo-600 hover:underline">
                                                     Terms & Conditions
                                                 </a>
                                             </FormLabel>
@@ -436,8 +429,7 @@ export default function CompanyRegistration() {
                                 type="submit"
                                 className="w-full bg-indigo-600 hover:bg-indigo-700"
                                 disabled={isLoading}
-                                data-testid="button-submit"
-                            >
+                                data-testid="button-submit">
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -455,8 +447,7 @@ export default function CompanyRegistration() {
                         <a
                             href="/login/admin"
                             className="text-indigo-600 hover:underline font-medium"
-                            data-testid="link-login"
-                        >
+                            data-testid="link-login">
                             Login here
                         </a>
                     </div>

@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 export default function EmailVerification() {
     const [, setLocation] = useLocation();
     const [status, setStatus] = useState<"loading" | "success" | "error">(
-        "loading",
+        "loading"
     );
     const [message, setMessage] = useState("");
     const [companyId, setCompanyId] = useState("");
@@ -33,7 +33,7 @@ export default function EmailVerification() {
             try {
                 const res = await apiRequest(
                     `/api/auth/verify-company?token=${token}`,
-                    "GET",
+                    "GET"
                 );
                 const response = await res.json();
                 setStatus("success");
@@ -43,7 +43,7 @@ export default function EmailVerification() {
                 setStatus("error");
                 setMessage(
                     error.message ||
-                        "Verification failed. The token may be invalid or expired.",
+                        "Verification failed. The token may be invalid or expired."
                 );
             }
         };
@@ -107,8 +107,7 @@ export default function EmailVerification() {
                             <Button
                                 onClick={() => setLocation("/login/admin")}
                                 className="w-full bg-indigo-600 hover:bg-indigo-700"
-                                data-testid="button-go-to-login"
-                            >
+                                data-testid="button-go-to-login">
                                 Go to Login
                             </Button>
                         </>
@@ -126,16 +125,14 @@ export default function EmailVerification() {
                                 <Button
                                     onClick={() => setLocation("/register")}
                                     className="w-full bg-indigo-600 hover:bg-indigo-700"
-                                    data-testid="button-register-again"
-                                >
+                                    data-testid="button-register-again">
                                     Try Registering Again
                                 </Button>
                                 <Button
                                     onClick={() => setLocation("/")}
                                     variant="outline"
                                     className="w-full"
-                                    data-testid="button-go-home"
-                                >
+                                    data-testid="button-go-home">
                                     Go to Home
                                 </Button>
                             </div>

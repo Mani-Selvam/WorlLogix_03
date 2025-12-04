@@ -163,15 +163,50 @@ async function initializeSuperAdmin() {
     const wss = new WebSocketServer({ noServer: true });
 
     server.on("upgrade", (request, socket, head) => {
-        if (request.url === "/ws") {
+        const url = request.url || "";
+        log(`[WebSocket] Upgrade request received for: ${url}`);
+
+        // Use startsWith to handle query parameters that Render might add
+        if (url.startsWith("/ws")) {
+            log(`[WebSocket] Upgrading connection for path: ${url}`);
             wss.handleUpgrade(request, socket, head, (ws) => {
                 wss.emit("connection", ws, request);
             });
+        } else {
+            log(`[WebSocket] Rejected upgrade for path: ${url}`);
+            socket.destroy();
         }
     });
 
+    // Ping interval to keep connections alive (Render has 60s timeout)
+    const pingInterval = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (ws.readyState === 1) {
+                ws.ping();
+            }
+        });
+    }, 30000); // Ping every 30 seconds
+
+    wss.on("close", () => {
+        clearInterval(pingInterval);
+    });
+
     wss.on("connection", (ws) => {
-        ws.on("error", console.error);
+        log(`[WebSocket] Client connected. Total clients: ${wss.clients.size}`);
+
+        ws.on("error", (error) => {
+            console.error("[WebSocket] Client error:", error);
+        });
+
+        ws.on("pong", () => {
+            // Client responded to ping - connection is alive
+        });
+
+        ws.on("close", () => {
+            log(
+                `[WebSocket] Client disconnected. Total clients: ${wss.clients.size}`
+            );
+        });
     });
 
     broadcast = (message: any) => {
@@ -201,9 +236,10 @@ async function initializeSuperAdmin() {
 
     // In development: server runs on port 3000, client (Vite) on port 5000 proxies here
     // In production: server runs on port 5000 and serves static files
-    const port = process.env.NODE_ENV === "production" 
-        ? parseInt(process.env.PORT || "5000", 10)
-        : 3000;
+    const port =
+        process.env.NODE_ENV === "production"
+            ? parseInt(process.env.PORT || "5000", 10)
+            : 3000;
     server.listen(
         {
             port,
