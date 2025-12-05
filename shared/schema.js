@@ -1,5 +1,14 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, serial, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+    pgTable,
+    text,
+    varchar,
+    timestamp,
+    boolean,
+    integer,
+    serial,
+    uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 export const companies = pgTable("companies", {
@@ -52,9 +61,13 @@ export const users = pgTable("users", {
 });
 export const tasks = pgTable("tasks", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     assignedBy: integer("assigned_by").references(() => users.id),
-    assignedTo: integer("assigned_to").references(() => users.id).notNull(),
+    assignedTo: integer("assigned_to")
+        .references(() => users.id)
+        .notNull(),
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description"),
     priority: varchar("priority", { length: 20 }).notNull().default("medium"),
@@ -66,8 +79,12 @@ export const tasks = pgTable("tasks", {
 });
 export const reports = pgTable("reports", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
-    userId: integer("user_id").references(() => users.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
     reportType: varchar("report_type", { length: 20 }).notNull(),
     plannedTasks: text("planned_tasks"),
     completedTasks: text("completed_tasks"),
@@ -77,28 +94,48 @@ export const reports = pgTable("reports", {
 });
 export const messages = pgTable("messages", {
     id: serial("id").primaryKey(),
-    senderId: integer("sender_id").references(() => users.id).notNull(),
-    receiverId: integer("receiver_id").references(() => users.id).notNull(),
+    senderId: integer("sender_id")
+        .references(() => users.id)
+        .notNull(),
+    receiverId: integer("receiver_id")
+        .references(() => users.id)
+        .notNull(),
     message: text("message").notNull(),
-    messageType: varchar("message_type", { length: 30 }).notNull().default("team_leader_to_employee"),
+    messageType: varchar("message_type", { length: 30 })
+        .notNull()
+        .default("team_leader_to_employee"),
     relatedTaskId: integer("related_task_id").references(() => tasks.id),
     readStatus: boolean("read_status").notNull().default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export const ratings = pgTable("ratings", {
-    id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
-    ratedBy: integer("rated_by").references(() => users.id).notNull(),
-    rating: varchar("rating", { length: 30 }).notNull(),
-    feedback: text("feedback"),
-    period: varchar("period", { length: 20 }).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (table) => ({
-    uniqueRatingPerPeriod: uniqueIndex("unique_rating_per_period").on(table.userId, table.ratedBy, table.period),
-}));
+export const ratings = pgTable(
+    "ratings",
+    {
+        id: serial("id").primaryKey(),
+        userId: integer("user_id")
+            .references(() => users.id)
+            .notNull(),
+        ratedBy: integer("rated_by")
+            .references(() => users.id)
+            .notNull(),
+        rating: varchar("rating", { length: 30 }).notNull(),
+        feedback: text("feedback"),
+        period: varchar("period", { length: 20 }).notNull(),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+    },
+    (table) => ({
+        uniqueRatingPerPeriod: uniqueIndex("unique_rating_per_period").on(
+            table.userId,
+            table.ratedBy,
+            table.period
+        ),
+    })
+);
 export const fileUploads = pgTable("file_uploads", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
     reportId: integer("report_id").references(() => reports.id),
     fileName: text("file_name").notNull(),
     fileUrl: text("file_url").notNull(),
@@ -107,7 +144,9 @@ export const fileUploads = pgTable("file_uploads", {
 });
 export const archiveReports = pgTable("archive_reports", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
     reportType: varchar("report_type", { length: 20 }).notNull(),
     plannedTasks: text("planned_tasks"),
     completedTasks: text("completed_tasks"),
@@ -118,35 +157,53 @@ export const archiveReports = pgTable("archive_reports", {
 });
 export const groupMessages = pgTable("group_messages", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
-    senderId: integer("sender_id").references(() => users.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
+    senderId: integer("sender_id")
+        .references(() => users.id)
+        .notNull(),
     message: text("message").notNull(),
     title: varchar("title", { length: 255 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export const groupMessageReplies = pgTable("group_message_replies", {
     id: serial("id").primaryKey(),
-    groupMessageId: integer("group_message_id").references(() => groupMessages.id).notNull(),
-    senderId: integer("sender_id").references(() => users.id).notNull(),
+    groupMessageId: integer("group_message_id")
+        .references(() => groupMessages.id)
+        .notNull(),
+    senderId: integer("sender_id")
+        .references(() => users.id)
+        .notNull(),
     message: text("message").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export const taskTimeLogs = pgTable("task_time_logs", {
     id: serial("id").primaryKey(),
-    taskId: integer("task_id").references(() => tasks.id).notNull(),
-    userId: integer("user_id").references(() => users.id).notNull(),
+    taskId: integer("task_id")
+        .references(() => tasks.id)
+        .notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
     date: varchar("date", { length: 10 }).notNull(),
     totalSeconds: integer("total_seconds").notNull().default(0),
     oldTimeSeconds: integer("old_time_seconds").notNull().default(0),
     newTimeSeconds: integer("new_time_seconds").notNull().default(0),
     timerStartedAt: timestamp("timer_started_at"),
-    timerStatus: varchar("timer_status", { length: 20 }).notNull().default("stopped"),
+    timerStatus: varchar("timer_status", { length: 20 })
+        .notNull()
+        .default("stopped"),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 export const feedbacks = pgTable("feedbacks", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
-    submittedBy: integer("submitted_by").references(() => users.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
+    submittedBy: integer("submitted_by")
+        .references(() => users.id)
+        .notNull(),
     recipientType: varchar("recipient_type", { length: 20 }).notNull(),
     message: text("message").notNull(),
     adminResponse: varchar("admin_response", { length: 50 }),
@@ -162,12 +219,16 @@ export const slotPricing = pgTable("slot_pricing", {
 });
 export const companyPayments = pgTable("company_payments", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     slotType: varchar("slot_type", { length: 20 }),
     slotQuantity: integer("slot_quantity"),
     amount: integer("amount").notNull(),
     currency: varchar("currency", { length: 10 }).notNull().default("INR"),
-    paymentStatus: varchar("payment_status", { length: 20 }).notNull().default("pending"),
+    paymentStatus: varchar("payment_status", { length: 20 })
+        .notNull()
+        .default("pending"),
     paymentMethod: varchar("payment_method", { length: 50 }),
     transactionId: varchar("transaction_id", { length: 255 }),
     stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
@@ -189,8 +250,12 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
 export const adminActivityLogs = pgTable("admin_activity_logs", {
     id: serial("id").primaryKey(),
     actionType: varchar("action_type", { length: 50 }).notNull(),
-    performedBy: integer("performed_by").references(() => users.id).notNull(),
-    targetCompanyId: integer("target_company_id").references(() => companies.id),
+    performedBy: integer("performed_by")
+        .references(() => users.id)
+        .notNull(),
+    targetCompanyId: integer("target_company_id").references(
+        () => companies.id
+    ),
     targetUserId: integer("target_user_id").references(() => users.id),
     details: text("details"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -214,8 +279,12 @@ export const autoTasks = pgTable("auto_tasks", {
 });
 export const leaves = pgTable("leaves", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     leaveType: varchar("leave_type", { length: 50 }).notNull(),
     startDate: varchar("start_date", { length: 10 }).notNull(),
     endDate: varchar("end_date", { length: 10 }).notNull(),
@@ -228,7 +297,9 @@ export const leaves = pgTable("leaves", {
 });
 export const holidays = pgTable("holidays", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     date: varchar("date", { length: 10 }).notNull(),
     description: text("description"),
@@ -237,8 +308,12 @@ export const holidays = pgTable("holidays", {
 });
 export const tasksReports = pgTable("tasks_reports", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     date: varchar("date", { length: 10 }).notNull(),
     tasksCompleted: text("tasks_completed").notNull(),
     notes: text("notes"),
@@ -248,7 +323,9 @@ export const tasksReports = pgTable("tasks_reports", {
 });
 export const shifts = pgTable("shifts", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     name: varchar("name", { length: 100 }).notNull(),
     startTime: varchar("start_time", { length: 10 }).notNull(),
     endTime: varchar("end_time", { length: 10 }).notNull(),
@@ -258,20 +335,28 @@ export const shifts = pgTable("shifts", {
 });
 export const attendancePolicies = pgTable("attendance_policies", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     halfDayHours: integer("half_day_hours").notNull().default(4),
     fullDayHours: integer("full_day_hours").notNull().default(8),
     lateMarkThreshold: integer("late_mark_threshold").notNull().default(3),
     autoAbsentHours: integer("auto_absent_hours").notNull().default(2),
     allowSelfCheckIn: boolean("allow_self_check_in").notNull().default(true),
     requireGPS: boolean("require_gps").notNull().default(false),
-    requireDeviceBinding: boolean("require_device_binding").notNull().default(false),
+    requireDeviceBinding: boolean("require_device_binding")
+        .notNull()
+        .default(false),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 export const attendanceRecords = pgTable("attendance_records", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     shiftId: integer("shift_id").references(() => shifts.id),
     date: varchar("date", { length: 10 }).notNull(),
     checkIn: timestamp("check_in"),
@@ -287,9 +372,15 @@ export const attendanceRecords = pgTable("attendance_records", {
 });
 export const correctionRequests = pgTable("correction_requests", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
-    attendanceId: integer("attendance_id").references(() => attendanceRecords.id),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
+    attendanceId: integer("attendance_id").references(
+        () => attendanceRecords.id
+    ),
     date: varchar("date", { length: 10 }).notNull(),
     requestedCheckIn: timestamp("requested_check_in"),
     requestedCheckOut: timestamp("requested_check_out"),
@@ -303,8 +394,12 @@ export const correctionRequests = pgTable("correction_requests", {
 });
 export const rewards = pgTable("rewards", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     points: integer("points").notNull(),
     reason: varchar("reason", { length: 255 }).notNull(),
     date: varchar("date", { length: 10 }).notNull(),
@@ -312,26 +407,42 @@ export const rewards = pgTable("rewards", {
 });
 export const attendanceLogs = pgTable("attendance_logs", {
     id: serial("id").primaryKey(),
-    attendanceId: integer("attendance_id").references(() => attendanceRecords.id).notNull(),
+    attendanceId: integer("attendance_id")
+        .references(() => attendanceRecords.id)
+        .notNull(),
     action: varchar("action", { length: 100 }).notNull(),
-    performedBy: integer("performed_by").references(() => users.id).notNull(),
+    performedBy: integer("performed_by")
+        .references(() => users.id)
+        .notNull(),
     oldValue: text("old_value"),
     newValue: text("new_value"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export const teamAssignments = pgTable("team_assignments", {
-    id: serial("id").primaryKey(),
-    teamLeaderId: integer("team_leader_id").references(() => users.id).notNull(),
-    memberId: integer("member_id").references(() => users.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
-    assignedAt: timestamp("assigned_at").defaultNow().notNull(),
-    removedAt: timestamp("removed_at"),
-}, (table) => ({
-    uniqueAssignment: sql `UNIQUE (team_leader_id, member_id, company_id, COALESCE(removed_at, '1970-01-01'))`,
-}));
+export const teamAssignments = pgTable(
+    "team_assignments",
+    {
+        id: serial("id").primaryKey(),
+        teamLeaderId: integer("team_leader_id")
+            .references(() => users.id)
+            .notNull(),
+        memberId: integer("member_id")
+            .references(() => users.id)
+            .notNull(),
+        companyId: integer("company_id")
+            .references(() => companies.id)
+            .notNull(),
+        assignedAt: timestamp("assigned_at").defaultNow().notNull(),
+        removedAt: timestamp("removed_at"),
+    },
+    (table) => ({
+        uniqueAssignment: sql`UNIQUE (team_leader_id, member_id, company_id, COALESCE(removed_at, '1970-01-01'))`,
+    })
+);
 export const enquiries = pgTable("enquiries", {
     id: serial("id").primaryKey(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     customerName: varchar("customer_name", { length: 255 }).notNull(),
     address: text("address"),
     mobileNo: varchar("mobile_no", { length: 20 }).notNull(),
@@ -342,21 +453,29 @@ export const enquiries = pgTable("enquiries", {
     enquiryDate: varchar("enquiry_date", { length: 10 }).notNull(),
     leadSource: varchar("lead_source", { length: 100 }),
     status: varchar("status", { length: 50 }).notNull().default("new"),
-    createdBy: integer("created_by").references(() => users.id).notNull(),
+    createdBy: integer("created_by")
+        .references(() => users.id)
+        .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 export const followups = pgTable("followups", {
     id: serial("id").primaryKey(),
-    enquiryId: integer("enquiry_id").references(() => enquiries.id).notNull(),
-    companyId: integer("company_id").references(() => companies.id).notNull(),
+    enquiryId: integer("enquiry_id")
+        .references(() => enquiries.id)
+        .notNull(),
+    companyId: integer("company_id")
+        .references(() => companies.id)
+        .notNull(),
     followupDate: varchar("followup_date", { length: 10 }).notNull(),
     remark: text("remark").notNull(),
     enquiryStatus: varchar("enquiry_status", { length: 50 }).notNull(),
     nextFollowupDate: varchar("next_followup_date", { length: 10 }),
     payment: varchar("payment", { length: 100 }),
     expectedDeliveryDate: varchar("expected_delivery_date", { length: 10 }),
-    createdBy: integer("created_by").references(() => users.id).notNull(),
+    createdBy: integer("created_by")
+        .references(() => users.id)
+        .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export const insertCompanySchema = createInsertSchema(companies).omit({
@@ -385,62 +504,96 @@ export const firebaseSigninSchema = z.object({
     photoURL: z.string().optional(),
     firebaseUid: z.string().min(1, "Firebase UID is required"),
 });
-const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-export const companyBasicRegistrationSchema = z.object({
-    companyName: z.string().min(2, "Company name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string()
-        .min(8, "Password must be at least 8 characters")
-        .regex(strongPasswordRegex, "Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@$!%*?&)"),
-    confirmPassword: z.string(),
-    acceptTerms: z.literal(true, {
-        errorMap: () => ({ message: "You must accept the terms and conditions" }),
-    }),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-});
+const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+export const companyBasicRegistrationSchema = z
+    .object({
+        companyName: z
+            .string()
+            .min(2, "Company name must be at least 2 characters"),
+        email: z.string().email("Invalid email address"),
+        password: z
+            .string()
+            .min(8, "Password must be at least 8 characters")
+            .regex(
+                strongPasswordRegex,
+                "Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@$!%*?&)"
+            ),
+        confirmPassword: z.string(),
+        acceptTerms: z.literal(true, {
+            errorMap: () => ({
+                message: "You must accept the terms and conditions",
+            }),
+        }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    });
 export const companyGoogleRegistrationSchema = z.object({
-    companyName: z.string().min(2, "Company name must be at least 2 characters"),
+    companyName: z
+        .string()
+        .min(2, "Company name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
     firebaseUid: z.string().min(1, "Firebase UID is required"),
     photoURL: z.string().optional(),
     acceptTerms: z.literal(true, {
-        errorMap: () => ({ message: "You must accept the terms and conditions" }),
+        errorMap: () => ({
+            message: "You must accept the terms and conditions",
+        }),
     }),
 });
-export const companyRegistrationSchema = z.object({
-    fullName: z.string().min(2, "Full name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string()
-        .min(8, "Password must be at least 8 characters")
-        .regex(strongPasswordRegex, "Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@$!%*?&)"),
-    confirmPassword: z.string(),
-    name: z.string().min(2, "Company name must be at least 2 characters"),
-    companyType: z.string().min(1, "Please select a company type"),
-    contactPerson: z.string().min(2, "Contact person name is required"),
-    designation: z.string().min(1, "Please select a designation"),
-    mobile: z.string().regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
-    website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
-    address: z.string().min(5, "Please enter a complete address"),
-    pincode: z.string().regex(/^\d{6}$/, "Please enter a valid 6-digit pincode"),
-    city: z.string().min(2, "City is required"),
-    state: z.string().min(2, "State is required"),
-    country: z.string().min(2, "Country is required"),
-    employees: z.number().min(1, "Number of employees must be at least 1"),
-    annualTurnover: z.string().min(1, "Please select annual turnover range"),
-    yearEstablished: z.number()
-        .min(1800, "Year must be valid")
-        .max(new Date().getFullYear(), "Year cannot be in the future"),
-    description: z.string().optional(),
-    logo: z.string().optional(),
-    acceptTerms: z.literal(true, {
-        errorMap: () => ({ message: "You must accept the terms and conditions" }),
-    }),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-});
+export const companyRegistrationSchema = z
+    .object({
+        fullName: z.string().min(2, "Full name must be at least 2 characters"),
+        email: z.string().email("Invalid email address"),
+        password: z
+            .string()
+            .min(8, "Password must be at least 8 characters")
+            .regex(
+                strongPasswordRegex,
+                "Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@$!%*?&)"
+            ),
+        confirmPassword: z.string(),
+        name: z.string().min(2, "Company name must be at least 2 characters"),
+        companyType: z.string().min(1, "Please select a company type"),
+        contactPerson: z.string().min(2, "Contact person name is required"),
+        designation: z.string().min(1, "Please select a designation"),
+        mobile: z
+            .string()
+            .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
+        website: z
+            .string()
+            .url("Please enter a valid URL")
+            .optional()
+            .or(z.literal("")),
+        address: z.string().min(5, "Please enter a complete address"),
+        pincode: z
+            .string()
+            .regex(/^\d{6}$/, "Please enter a valid 6-digit pincode"),
+        city: z.string().min(2, "City is required"),
+        state: z.string().min(2, "State is required"),
+        country: z.string().min(2, "Country is required"),
+        employees: z.number().min(1, "Number of employees must be at least 1"),
+        annualTurnover: z
+            .string()
+            .min(1, "Please select annual turnover range"),
+        yearEstablished: z
+            .number()
+            .min(1800, "Year must be valid")
+            .max(new Date().getFullYear(), "Year cannot be in the future"),
+        description: z.string().optional(),
+        logo: z.string().optional(),
+        acceptTerms: z.literal(true, {
+            errorMap: () => ({
+                message: "You must accept the terms and conditions",
+            }),
+        }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    });
 export const superAdminLoginSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
@@ -456,23 +609,39 @@ export const companyUserLoginSchema = z.object({
     userId: z.string().min(1, "User ID is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
 });
-export const insertTaskSchema = createInsertSchema(tasks).omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-}).extend({
-    deadline: z.string().nullable().optional().transform(val => val ? new Date(val) : null),
-});
+export const insertTaskSchema = createInsertSchema(tasks)
+    .omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+    })
+    .extend({
+        deadline: z
+            .string()
+            .nullable()
+            .optional()
+            .transform((val) => (val ? new Date(val) : null)),
+    });
 export const insertReportSchema = createInsertSchema(reports).omit({
     id: true,
     createdAt: true,
 });
-export const insertMessageSchema = createInsertSchema(messages).omit({
-    id: true,
-    createdAt: true,
-}).extend({
-    messageType: z.enum(['admin_to_employee', 'admin_to_team_leader', 'team_leader_to_employee', 'employee_to_team_leader', 'team_leader_to_admin', 'employee_to_admin', 'admin_to_admin']),
-});
+export const insertMessageSchema = createInsertSchema(messages)
+    .omit({
+        id: true,
+        createdAt: true,
+    })
+    .extend({
+        messageType: z.enum([
+            "admin_to_employee",
+            "admin_to_team_leader",
+            "team_leader_to_employee",
+            "employee_to_team_leader",
+            "team_leader_to_admin",
+            "employee_to_admin",
+            "admin_to_admin",
+        ]),
+    });
 export const insertRatingSchema = createInsertSchema(ratings).omit({
     id: true,
     createdAt: true,
@@ -485,7 +654,9 @@ export const insertGroupMessageSchema = createInsertSchema(groupMessages).omit({
     id: true,
     createdAt: true,
 });
-export const insertGroupMessageReplySchema = createInsertSchema(groupMessageReplies).omit({
+export const insertGroupMessageReplySchema = createInsertSchema(
+    groupMessageReplies
+).omit({
     id: true,
     createdAt: true,
 });
@@ -493,33 +664,39 @@ export const insertTaskTimeLogSchema = createInsertSchema(taskTimeLogs).omit({
     id: true,
     updatedAt: true,
 });
-export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
-    id: true,
-    createdAt: true,
-    respondedAt: true,
-}).extend({
-    recipientType: z.enum(['Admin', 'TeamLeader', 'Employee']),
-});
-export const insertSlotPricingSchema = createInsertSchema(slotPricing).omit({
-    id: true,
-    updatedAt: true,
-}).extend({
-    slotType: z.enum(['admin', 'member']),
-    pricePerSlot: z.number().min(0, "Price must be non-negative"),
-});
-export const insertCompanyPaymentSchema = createInsertSchema(companyPayments).omit({
-    id: true,
-    createdAt: true,
-}).extend({
-    slotType: z.enum(['admin', 'member']).optional(),
-    paymentStatus: z.enum(['pending', 'paid', 'failed', 'cancelled']),
-});
+export const insertFeedbackSchema = createInsertSchema(feedbacks)
+    .omit({
+        id: true,
+        createdAt: true,
+        respondedAt: true,
+    })
+    .extend({
+        recipientType: z.enum(["Admin", "TeamLeader", "Employee"]),
+    });
+export const insertSlotPricingSchema = createInsertSchema(slotPricing)
+    .omit({
+        id: true,
+        updatedAt: true,
+    })
+    .extend({
+        slotType: z.enum(["admin", "member"]),
+        pricePerSlot: z.number().min(0, "Price must be non-negative"),
+    });
+export const insertCompanyPaymentSchema = createInsertSchema(companyPayments)
+    .omit({
+        id: true,
+        createdAt: true,
+    })
+    .extend({
+        slotType: z.enum(["admin", "member"]).optional(),
+        paymentStatus: z.enum(["pending", "paid", "failed", "cancelled"]),
+    });
 export const slotPurchaseSchema = z.object({
-    slotType: z.enum(['admin', 'member']),
+    slotType: z.enum(["admin", "member"]),
     quantity: z.number().min(1, "Quantity must be at least 1"),
 });
 export const updatePaymentStatusSchema = z.object({
-    status: z.enum(['pending', 'paid', 'failed', 'cancelled']),
+    status: z.enum(["pending", "paid", "failed", "cancelled"]),
 });
 export const passwordResetRequestSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -528,7 +705,9 @@ export const passwordResetSchema = z.object({
     token: z.string().min(1, "Token is required"),
     newPassword: z.string().min(6, "Password must be at least 6 characters"),
 });
-export const insertAdminActivityLogSchema = createInsertSchema(adminActivityLogs).omit({
+export const insertAdminActivityLogSchema = createInsertSchema(
+    adminActivityLogs
+).omit({
     id: true,
     createdAt: true,
 });
@@ -558,16 +737,22 @@ export const insertShiftSchema = createInsertSchema(shifts).omit({
     id: true,
     createdAt: true,
 });
-export const insertAttendancePolicySchema = createInsertSchema(attendancePolicies).omit({
+export const insertAttendancePolicySchema = createInsertSchema(
+    attendancePolicies
+).omit({
     id: true,
     updatedAt: true,
 });
-export const insertAttendanceRecordSchema = createInsertSchema(attendanceRecords).omit({
+export const insertAttendanceRecordSchema = createInsertSchema(
+    attendanceRecords
+).omit({
     id: true,
     createdAt: true,
     updatedAt: true,
 });
-export const insertCorrectionRequestSchema = createInsertSchema(correctionRequests).omit({
+export const insertCorrectionRequestSchema = createInsertSchema(
+    correctionRequests
+).omit({
     id: true,
     createdAt: true,
     updatedAt: true,
@@ -576,11 +761,15 @@ export const insertRewardSchema = createInsertSchema(rewards).omit({
     id: true,
     createdAt: true,
 });
-export const insertAttendanceLogSchema = createInsertSchema(attendanceLogs).omit({
+export const insertAttendanceLogSchema = createInsertSchema(
+    attendanceLogs
+).omit({
     id: true,
     createdAt: true,
 });
-export const insertTeamAssignmentSchema = createInsertSchema(teamAssignments).omit({
+export const insertTeamAssignmentSchema = createInsertSchema(
+    teamAssignments
+).omit({
     id: true,
     assignedAt: true,
 });
@@ -595,7 +784,9 @@ export const insertFollowupSchema = createInsertSchema(followups).omit({
 });
 export const deviceTokens = pgTable("device_tokens", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").references(() => users.id).notNull(),
+    userId: integer("user_id")
+        .references(() => users.id)
+        .notNull(),
     token: text("token").notNull().unique(),
     deviceType: varchar("device_type", { length: 20 }).notNull().default("web"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
