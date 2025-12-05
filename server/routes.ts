@@ -505,21 +505,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.get("/api/auth/verify-company", async (req, res, next) => {
         try {
             const { token } = req.query;
+            console.log(
+                `[VERIFY] Verification request received with token: ${
+                    token
+                        ? token.toString().substring(0, 20) + "..."
+                        : "missing"
+                }`
+            );
 
             if (!token || typeof token !== "string") {
+                console.log("[VERIFY] Token is missing or invalid type");
                 return res
                     .status(400)
                     .json({ message: "Verification token is required" });
             }
 
+            console.log(`[VERIFY] Looking up company with token...`);
             const company = await storage.verifyCompanyEmail(token);
 
             if (!company) {
+                console.log(
+                    "[VERIFY] No company found with this token or token expired"
+                );
                 return res
                     .status(400)
                     .json({ message: "Invalid or expired verification token" });
             }
 
+            console.log(
+                `[VERIFY] Company verified successfully: ${company.serverId}`
+            );
             const { password: _, ...companyWithoutPassword } = company;
             res.json({
                 company: companyWithoutPassword,
@@ -527,6 +542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     "Email verified successfully! You can now log in to your dashboard.",
             });
         } catch (error) {
+            console.error("[VERIFY] Error during verification:", error);
             next(error);
         }
     });
