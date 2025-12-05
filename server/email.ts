@@ -227,13 +227,26 @@ export async function sendPasswordResetEmail(data: {
     try {
         const { client, fromEmail } = await getResendClient();
 
-        const frontendUrl =
-            data.baseUrl ||
-            process.env.FRONTEND_URL ||
-            process.env.VITE_API_URL ||
-            "http://localhost:5000";
+        // Determine the correct frontend URL for password reset
+        let frontendUrl: string;
+        
+        if (data.baseUrl) {
+            frontendUrl = data.baseUrl;
+        } else if (process.env.REPLIT_DEV_DOMAIN) {
+            frontendUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+        } else if (process.env.REPLIT_DOMAINS) {
+            const domains = process.env.REPLIT_DOMAINS.split(',');
+            frontendUrl = `https://${domains[0].trim()}`;
+        } else if (process.env.FRONTEND_URL) {
+            frontendUrl = process.env.FRONTEND_URL;
+        } else if (process.env.VITE_API_URL) {
+            frontendUrl = process.env.VITE_API_URL;
+        } else {
+            frontendUrl = "http://localhost:5000";
+        }
 
         const resetUrl = `${frontendUrl}/reset-password?token=${data.resetToken}`;
+        console.log(`[EMAIL] Password reset URL: ${resetUrl}`);
 
         const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
@@ -442,11 +455,23 @@ export async function sendCompanyVerificationEmail(data: {
         );
         console.log(`[EMAIL] From: ${fromEmail}`);
 
-        const frontendUrl =
-            data.baseUrl ||
-            process.env.FRONTEND_URL ||
-            process.env.VITE_API_URL ||
-            "http://localhost:5000";
+        // Determine the correct frontend URL for verification
+        let frontendUrl: string;
+        
+        if (data.baseUrl) {
+            frontendUrl = data.baseUrl;
+        } else if (process.env.REPLIT_DEV_DOMAIN) {
+            frontendUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+        } else if (process.env.REPLIT_DOMAINS) {
+            const domains = process.env.REPLIT_DOMAINS.split(',');
+            frontendUrl = `https://${domains[0].trim()}`;
+        } else if (process.env.FRONTEND_URL) {
+            frontendUrl = process.env.FRONTEND_URL;
+        } else if (process.env.VITE_API_URL) {
+            frontendUrl = process.env.VITE_API_URL;
+        } else {
+            frontendUrl = "http://localhost:5000";
+        }
 
         const verificationUrl = `${frontendUrl}/verify?token=${data.verificationToken}`;
         console.log(`[EMAIL] Verification URL: ${verificationUrl}`);
