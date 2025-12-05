@@ -229,7 +229,6 @@ export async function sendPasswordResetEmail(data: {
         const resetUrl = `${
             process.env.FRONTEND_URL ||
             process.env.VITE_API_URL ||
-            process.env.REPLIT_DEV_DOMAIN ||
             "http://localhost:5000"
         }/reset-password?token=${data.resetToken}`;
 
@@ -442,7 +441,6 @@ export async function sendCompanyVerificationEmail(data: {
         const verificationUrl = `${
             process.env.FRONTEND_URL ||
             process.env.VITE_API_URL ||
-            process.env.REPLIT_DEV_DOMAIN ||
             "http://localhost:5000"
         }/verify?token=${data.verificationToken}`;
 
