@@ -227,6 +227,7 @@ export async function sendPasswordResetEmail(data: {
         const { client, fromEmail } = await getResendClient();
 
         const resetUrl = `${
+            process.env.FRONTEND_URL ||
             process.env.VITE_API_URL ||
             process.env.REPLIT_DEV_DOMAIN ||
             "http://localhost:5000"
@@ -439,6 +440,7 @@ export async function sendCompanyVerificationEmail(data: {
         console.log(`[EMAIL] From: ${fromEmail}`);
 
         const verificationUrl = `${
+            process.env.FRONTEND_URL ||
             process.env.VITE_API_URL ||
             process.env.REPLIT_DEV_DOMAIN ||
             "http://localhost:5000"
