@@ -222,15 +222,18 @@ export async function sendPasswordResetEmail(data: {
     email: string;
     resetToken: string;
     userName?: string;
+    baseUrl?: string;
 }) {
     try {
         const { client, fromEmail } = await getResendClient();
 
-        const resetUrl = `${
+        const frontendUrl =
+            data.baseUrl ||
             process.env.FRONTEND_URL ||
             process.env.VITE_API_URL ||
-            "http://localhost:5000"
-        }/reset-password?token=${data.resetToken}`;
+            "http://localhost:5000";
+
+        const resetUrl = `${frontendUrl}/reset-password?token=${data.resetToken}`;
 
         const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
@@ -429,6 +432,7 @@ export async function sendCompanyVerificationEmail(data: {
     email: string;
     serverId: string;
     verificationToken: string;
+    baseUrl?: string;
 }) {
     try {
         const { client, fromEmail } = await getResendClient();
@@ -438,11 +442,14 @@ export async function sendCompanyVerificationEmail(data: {
         );
         console.log(`[EMAIL] From: ${fromEmail}`);
 
-        const verificationUrl = `${
+        const frontendUrl =
+            data.baseUrl ||
             process.env.FRONTEND_URL ||
             process.env.VITE_API_URL ||
-            "http://localhost:5000"
-        }/verify?token=${data.verificationToken}`;
+            "http://localhost:5000";
+
+        const verificationUrl = `${frontendUrl}/verify?token=${data.verificationToken}`;
+        console.log(`[EMAIL] Verification URL: ${verificationUrl}`);
 
         const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">

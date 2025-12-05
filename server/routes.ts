@@ -393,11 +393,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 emailVerified: false,
             });
 
+            const protocol =
+                req.headers["x-forwarded-proto"] || req.protocol || "https";
+            const host = req.headers["x-forwarded-host"] || req.headers.host;
+            const baseUrl = `${protocol}://${host}`;
+
             await sendCompanyVerificationEmail({
                 companyName: validatedData.companyName,
                 email: validatedData.email,
                 serverId: company.serverId,
                 verificationToken,
+                baseUrl,
             });
 
             res.json({
@@ -4568,10 +4574,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 expiresAt
             );
 
+            const protocol =
+                req.headers["x-forwarded-proto"] || req.protocol || "https";
+            const host = req.headers["x-forwarded-host"] || req.headers.host;
+            const baseUrl = `${protocol}://${host}`;
+
             await sendPasswordResetEmail({
                 email: validatedData.email,
                 resetToken,
                 userName: user?.displayName || company?.name || "User",
+                baseUrl,
             });
 
             res.json({
