@@ -6,11 +6,12 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "VITE_");
     const isProduction = mode === "production";
-    const apiUrl = env.VITE_API_URL || process.env.VITE_API_URL || "http://localhost:3000";
+    const apiUrl =
+        env.VITE_API_URL || process.env.VITE_API_URL || "http://localhost:3000";
     const isExternalApi = apiUrl !== "http://localhost:3000";
 
     const proxyConfig: Record<string, any> = {};
-    
+
     if (!isProduction) {
         proxyConfig["/api"] = {
             target: apiUrl,
