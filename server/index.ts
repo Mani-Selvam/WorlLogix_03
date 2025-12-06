@@ -11,8 +11,30 @@ import passport from "./passport";
 import dotenv from "dotenv";
 import cron from "node-cron";
 import path from "path";
+import cors from "cors";
 dotenv.config();
 const app = express();
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim())
+    : ["http://localhost:5000", "http://localhost:3000"];
+
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                log(`CORS blocked request from origin: ${origin}`);
+                callback(new Error("Not allowed by CORS"), false);
+            }
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "x-user-id"],
+    })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -34,6 +56,9 @@ app.use(express.static(path.join(currentDir, "..", "public")));
 
 const PgSession = connectPgSimple(session);
 
+const isProduction = process.env.NODE_ENV === "production";
+const isCrossOrigin = !!process.env.ALLOWED_ORIGINS;
+
 const sessionConfig: session.SessionOptions = {
     secret:
         process.env.SESSION_SECRET ||
@@ -41,9 +66,10 @@ const sessionConfig: session.SessionOptions = {
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
+        sameSite: isCrossOrigin ? "none" : "lax",
     },
 };
 

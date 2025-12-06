@@ -55,18 +55,17 @@ Make sure the `.htaccess` file is uploaded to `public_html/`.
 
 ## Step 4: Configure CORS on Render Backend
 
-Your Render backend must allow requests from your cPanel domain. Update your backend CORS settings:
+Your Render backend must allow requests from your cPanel domain. Add this environment variable in Render:
 
-```javascript
-// In your Express server
-app.use(cors({
-  origin: [
-    'https://your-cpanel-domain.com',
-    'https://www.your-cpanel-domain.com'
-  ],
-  credentials: true
-}));
+**In Render Dashboard > Your Service > Environment:**
+
 ```
+ALLOWED_ORIGINS=https://your-cpanel-domain.com,https://www.your-cpanel-domain.com
+```
+
+Replace `your-cpanel-domain.com` with your actual cPanel domain.
+
+The backend is already configured to read this environment variable and allow cross-origin requests.
 
 ## Troubleshooting
 
