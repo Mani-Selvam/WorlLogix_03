@@ -229,13 +229,13 @@ export async function sendPasswordResetEmail(data: {
 
         // Determine the correct frontend URL for password reset
         let frontendUrl: string;
-        
+
         if (data.baseUrl) {
             frontendUrl = data.baseUrl;
         } else if (process.env.REPLIT_DEV_DOMAIN) {
             frontendUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
         } else if (process.env.REPLIT_DOMAINS) {
-            const domains = process.env.REPLIT_DOMAINS.split(',');
+            const domains = process.env.REPLIT_DOMAINS.split(",");
             frontendUrl = `https://${domains[0].trim()}`;
         } else if (process.env.FRONTEND_URL) {
             frontendUrl = process.env.FRONTEND_URL;
@@ -457,13 +457,13 @@ export async function sendCompanyVerificationEmail(data: {
 
         // Determine the correct frontend URL for verification
         let frontendUrl: string;
-        
+
         if (data.baseUrl) {
             frontendUrl = data.baseUrl;
         } else if (process.env.REPLIT_DEV_DOMAIN) {
             frontendUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
         } else if (process.env.REPLIT_DOMAINS) {
-            const domains = process.env.REPLIT_DOMAINS.split(',');
+            const domains = process.env.REPLIT_DOMAINS.split(",");
             frontendUrl = `https://${domains[0].trim()}`;
         } else if (process.env.FRONTEND_URL) {
             frontendUrl = process.env.FRONTEND_URL;
