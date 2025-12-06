@@ -5,9 +5,8 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "");
-    const apiUrl =
-        "https://worllogix-03.onrender.com" || "http://localhost:3000";
-    const isExternalApi = !!apiUrl;
+    const apiUrl = process.env.VITE_API_URL || "http://localhost:3000";
+    const isExternalApi = apiUrl !== "http://localhost:3000";
 
     const proxyConfig: Record<string, any> = {
         "/api": {

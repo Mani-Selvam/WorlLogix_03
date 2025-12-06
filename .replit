@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web", "postgresql-16"]
+modules = ["nodejs-20", "web"]
 
 [nix]
 channel = "stable-25_05"
@@ -27,7 +27,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev & npm run dev:client"
+args = "npm run dev"
 waitForPort = 5000
 
 [[ports]]
@@ -39,9 +39,14 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 36211
+localPort = 33125
 externalPort = 3002
 
 [[ports]]
 localPort = 45535
 externalPort = 3001
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["npm", "run", "start"]
+build = ["npm", "run", "build"]
