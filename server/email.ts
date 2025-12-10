@@ -245,7 +245,9 @@ export async function sendPasswordResetEmail(data: {
             frontendUrl = "http://localhost:5000";
         }
 
-        const resetUrl = `${frontendUrl}/reset-password?token=${data.resetToken}`;
+        // Get the base path for frontend routes (e.g., /worklogix)
+        const basePath = process.env.FRONTEND_BASE_PATH || "";
+        const resetUrl = `${frontendUrl}${basePath}/reset-password?token=${data.resetToken}`;
         console.log(`[EMAIL] Password reset URL: ${resetUrl}`);
 
         const htmlContent = `
@@ -473,7 +475,9 @@ export async function sendCompanyVerificationEmail(data: {
             frontendUrl = "http://localhost:5000";
         }
 
-        const verificationUrl = `${frontendUrl}/verify?token=${data.verificationToken}`;
+        // Get the base path for frontend routes (e.g., /worklogix)
+        const basePath = process.env.FRONTEND_BASE_PATH || "";
+        const verificationUrl = `${frontendUrl}${basePath}/verify?token=${data.verificationToken}`;
         console.log(`[EMAIL] Verification URL: ${verificationUrl}`);
 
         const htmlContent = `
