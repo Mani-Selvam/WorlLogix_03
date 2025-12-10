@@ -21,7 +21,17 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(
     cors({
-        origin: (origin, callback) => {
+        /*************  ✨ Windsurf Command ⭐  *************/
+        /**
+ * The origin function for CORS. This function is called by the cors middleware
+ * for each incoming request. It checks if the origin of the request is allowed
+ * and calls the callback function accordingly.
+ *
+ * @param {string} origin - The origin of the request.
+/*******  869e80a9-2771-471b-8aa8-98d3138bd5cf  *******/ origin: (
+            origin,
+            callback
+        ) => {
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {

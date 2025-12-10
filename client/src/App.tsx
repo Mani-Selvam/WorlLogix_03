@@ -1,4 +1,4 @@
-import { Switch, Route, Redirect } from "wouter";
+import { Switch, Route, Redirect, Router as WouterRouter } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -722,17 +722,19 @@ function Router() {
 
 function App() {
     return (
-        <WebSocketProvider>
-            <QueryClientProvider client={queryClient}>
-                <TooltipProvider>
-                    <AuthProvider>
-                        <Toaster />
-                        <NotificationPermissionBanner />
-                        <Router />
-                    </AuthProvider>
-                </TooltipProvider>
-            </QueryClientProvider>
-        </WebSocketProvider>
+        <WouterRouter base="/worklogix">
+            <WebSocketProvider>
+                <QueryClientProvider client={queryClient}>
+                    <TooltipProvider>
+                        <AuthProvider>
+                            <Toaster />
+                            <NotificationPermissionBanner />
+                            <Router />
+                        </AuthProvider>
+                    </TooltipProvider>
+                </QueryClientProvider>
+            </WebSocketProvider>
+        </WouterRouter>
     );
 }
 

@@ -19,7 +19,7 @@ Run this command to build the frontend with your Render backend URL:
 
 ```bash
 # Replace with your actual Render backend URL
-VITE_API_URL=https://worllogix-03.onrender.com npm run build:cpanel
+npm run build:cpanel
 ```
 
 This creates a `dist/` folder with all the static files.

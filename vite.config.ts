@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
     }
 
     return {
+        base: "./",
         define: {
             "import.meta.env.VITE_API_URL": JSON.stringify(apiUrl),
         },
