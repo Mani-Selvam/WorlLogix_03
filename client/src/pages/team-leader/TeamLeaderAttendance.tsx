@@ -5,7 +5,7 @@ import { Clock, Calendar, LogIn, LogOut } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
@@ -24,23 +24,23 @@ export default function TeamLeaderAttendance() {
   const { toast } = useToast();
 
   const { data: todayRecord, isLoading: loadingToday } = useQuery<AttendanceRecord>({
-    queryKey: [`/api/attendance/today`],
+    queryKey: [`${API_BASE_URL}/api/attendance/today`],
     enabled: !!dbUserId,
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   const { data: recentAttendance = [], isLoading: loadingHistory } = useQuery<AttendanceRecord[]>({
-    queryKey: [`/api/attendance/history`],
+    queryKey: [`${API_BASE_URL}/api/attendance/history`],
     enabled: !!dbUserId,
   });
 
   const checkInMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/attendance/check-in', 'POST', {});
+      return apiRequest(`${API_BASE_URL}/api/attendance/check-in`, 'POST', {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/attendance/today`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/attendance/history`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/history`] });
       toast({ title: "Success", description: "Checked in successfully" });
     },
     onError: (error: any) => {
@@ -50,11 +50,11 @@ export default function TeamLeaderAttendance() {
 
   const checkOutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/attendance/check-out', 'POST', {});
+      return apiRequest(`${API_BASE_URL}/api/attendance/check-out`, 'POST', {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/attendance/today`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/attendance/history`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/history`] });
       toast({ title: "Success", description: "Checked out successfully" });
     },
     onError: (error: any) => {

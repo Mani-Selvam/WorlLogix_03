@@ -5,10 +5,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { Activity, Building2, User, Settings } from "lucide-react";
 import type { AdminActivityLog } from "@shared/schema";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 export default function ActivityLogs() {
   const { data: logs = [], isLoading } = useQuery<AdminActivityLog[]>({
-    queryKey: ['/api/super-admin/activity-logs'],
+    queryKey: [`${API_BASE_URL}/api/super-admin/activity-logs`],
   });
 
   const getActionIcon = (actionType: string) => {

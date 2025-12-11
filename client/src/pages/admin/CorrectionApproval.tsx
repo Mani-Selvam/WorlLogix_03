@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Clock, Check, X, FileEdit } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 import type { CorrectionRequest } from "@shared/schema";
 
 type CorrectionWithUser = CorrectionRequest & { userName: string };
@@ -23,15 +23,15 @@ export default function CorrectionApproval() {
   const [comments, setComments] = useState("");
 
   const { data: corrections = [], isLoading } = useQuery<CorrectionWithUser[]>({
-    queryKey: ['/api/admin/attendance/corrections/pending'],
+    queryKey: [`${API_BASE_URL}/api/admin/attendance/corrections/pending`],
   });
 
   const approveMutation = useMutation({
     mutationFn: async ({ id, comments }: { id: number; comments: string }) => {
-      return await apiRequest(`/api/admin/attendance/corrections/${id}/approve`, 'PATCH', { comments });
+      return await apiRequest(`${API_BASE_URL}/api/admin/attendance/corrections/${id}/approve`, 'PATCH', { comments });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/attendance/corrections/pending'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/admin/attendance/corrections/pending`] });
       setReviewDialog({ open: false, request: null, action: null });
       setComments("");
       toast({
@@ -50,10 +50,10 @@ export default function CorrectionApproval() {
 
   const rejectMutation = useMutation({
     mutationFn: async ({ id, comments }: { id: number; comments: string }) => {
-      return await apiRequest(`/api/admin/attendance/corrections/${id}/reject`, 'PATCH', { comments });
+      return await apiRequest(`${API_BASE_URL}/api/admin/attendance/corrections/${id}/reject`, 'PATCH', { comments });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/attendance/corrections/pending'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/admin/attendance/corrections/pending`] });
       setReviewDialog({ open: false, request: null, action: null });
       setComments("");
       toast({

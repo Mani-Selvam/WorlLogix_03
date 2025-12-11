@@ -5,6 +5,7 @@ import { Calendar, ChevronDown, ChevronUp, Play, Pause, CheckCircle, Clock } fro
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 interface TaskCardProps {
   id: string;
@@ -49,9 +50,9 @@ export default function TaskCard({
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const { data: timeLog, refetch: refetchTimeLog } = useQuery({
-    queryKey: [`/api/tasks/${id}/timer`, userId, today],
+    queryKey: [`${API_BASE_URL}/api/tasks/${id}/timer`, userId, today],
     queryFn: async () => {
-      const res = await fetch(`/api/tasks/${id}/timer?userId=${userId}&date=${today}`);
+      const res = await fetch(`${API_BASE_URL}/api/tasks/${id}/timer?userId=${userId}&date=${today}`);
       if (!res.ok) return null;
       return res.json();
     },
@@ -79,7 +80,7 @@ export default function TaskCard({
 
   const startTimerMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`/api/tasks/${id}/timer/start`, {
+      const res = await fetch(`${API_BASE_URL}/api/tasks/${id}/timer/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, date: today }),
@@ -94,7 +95,7 @@ export default function TaskCard({
 
   const pauseTimerMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`/api/tasks/${id}/timer/pause`, {
+      const res = await fetch(`${API_BASE_URL}/api/tasks/${id}/timer/pause`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, date: today }),
@@ -109,14 +110,14 @@ export default function TaskCard({
 
   const completeTimerMutation = useMutation({
     mutationFn: async () => {
-      const timerRes = await fetch(`/api/tasks/${id}/timer/complete`, {
+      const timerRes = await fetch(`${API_BASE_URL}/api/tasks/${id}/timer/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, date: today }),
       });
       if (!timerRes.ok) throw new Error('Failed to complete timer');
       
-      const statusRes = await fetch(`/api/tasks/${id}/status`, {
+      const statusRes = await fetch(`${API_BASE_URL}/api/tasks/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'completed' }),

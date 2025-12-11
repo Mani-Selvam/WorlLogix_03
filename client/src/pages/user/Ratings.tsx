@@ -4,12 +4,13 @@ import RatingBadge from "@/components/RatingBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import type { Rating } from "@shared/schema";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 export default function Ratings() {
   const { dbUserId } = useAuth();
 
   const { data: ratings = [], isLoading } = useQuery<Rating[]>({
-    queryKey: ['/api/ratings', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/ratings`, dbUserId],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
@@ -18,7 +19,7 @@ export default function Ratings() {
         headers["x-user-id"] = userId.toString();
       }
       
-      const res = await fetch(`/api/ratings?userId=${dbUserId}`, { headers, credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/ratings?userId=${dbUserId}`, { headers, credentials: "include" });
       if (!res.ok) throw new Error('Failed to fetch ratings');
       return res.json();
     },

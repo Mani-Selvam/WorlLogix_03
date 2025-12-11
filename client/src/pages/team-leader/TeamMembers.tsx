@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 interface TeamMember {
   id: number;
@@ -23,7 +24,7 @@ export default function TeamMembers() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: teamMembers = [], isLoading } = useQuery<TeamMember[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
   });
 

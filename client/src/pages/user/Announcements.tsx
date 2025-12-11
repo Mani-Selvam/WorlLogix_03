@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Megaphone, MessageCircle, Send, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -76,14 +76,14 @@ function AnnouncementCard({ announcement }: { announcement: GroupMessage }) {
   const userId = user ? JSON.parse(user).id : null;
 
   const { data: replies = [], isLoading: repliesLoading } = useQuery<GroupMessageReply[]>({
-    queryKey: ['/api/group-messages', announcement.id, 'replies'],
+    queryKey: [`${API_BASE_URL}/api/group-messages/${announcement.id}/replies`, userId],
     queryFn: async () => {
       const headers: Record<string, string> = {};
       if (userId) {
         headers["x-user-id"] = userId.toString();
       }
       
-      const res = await fetch(`/api/group-messages/${announcement.id}/replies`, { headers, credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/group-messages/${announcement.id}/replies`, { headers, credentials: "include" });
       if (!res.ok) throw new Error('Failed to fetch replies');
       return res.json();
     },
@@ -92,10 +92,10 @@ function AnnouncementCard({ announcement }: { announcement: GroupMessage }) {
 
   const replyMutation = useMutation({
     mutationFn: async (message: string) => {
-      return await apiRequest(`/api/group-messages/${announcement.id}/replies`, 'POST', { message });
+      return await apiRequest(`${API_BASE_URL}/api/group-messages/${announcement.id}/replies`, 'POST', { message });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/group-messages', announcement.id, 'replies'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/group-messages/${announcement.id}/replies`] });
       setReplyText("");
       toast({
         title: "Reply sent",
@@ -212,7 +212,7 @@ export default function Announcements() {
   const { toast } = useToast();
 
   const { data: announcements = [], isLoading: loadingAnnouncements, refetch: refetchAnnouncements } = useQuery<GroupMessage[]>({
-    queryKey: ['/api/group-messages'],
+    queryKey: [`${API_BASE_URL}/api/group-messages`],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
@@ -221,19 +221,19 @@ export default function Announcements() {
         headers["x-user-id"] = userId.toString();
       }
       
-      const res = await fetch('/api/group-messages', { headers, credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/group-messages`, { headers, credentials: "include" });
       if (!res.ok) throw new Error('Failed to fetch announcements');
       return res.json();
     },
   });
 
   const { data: allMessages = [], isLoading: loadingMessages, refetch: refetchMessages } = useQuery<Message[]>({
-    queryKey: ['/api/messages'],
+    queryKey: [`${API_BASE_URL}/api/messages`],
     enabled: !!dbUserId,
   });
 
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   const adminMessages = allMessages.filter(
@@ -252,7 +252,7 @@ export default function Announcements() {
   useWebSocket((data) => {
     // New group message/announcement
     if (data.type === 'NEW_GROUP_MESSAGE') {
-      queryClient.invalidateQueries({ queryKey: ['/api/group-messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/group-messages`] });
       toast({
         title: "New Announcement",
         description: data.data?.title || "A new announcement has been posted",
@@ -264,7 +264,7 @@ export default function Announcements() {
       const messageData = data.data;
       // Refresh if employee receives any message
       if (messageData.receiverId === dbUserId) {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+        queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`] });
         toast({
           title: "New Message",
           description: `${messageData.senderName}: ${messageData.message.substring(0, 50)}${messageData.message.length > 50 ? '...' : ''}`,
@@ -275,10 +275,10 @@ export default function Announcements() {
     // Reply to group message
     if (data.type === 'GROUP_MESSAGE_REPLY') {
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/group-messages', data.groupMessageId, 'replies'] 
+        queryKey: [`${API_BASE_URL}/api/group-messages/${data.groupMessageId}/replies`] 
       });
       // Also refresh the main announcements list to update reply counts
-      queryClient.invalidateQueries({ queryKey: ['/api/group-messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/group-messages`] });
     }
   });
 

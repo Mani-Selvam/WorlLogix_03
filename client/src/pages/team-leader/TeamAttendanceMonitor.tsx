@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 interface AttendanceRecord {
   userId: number;
@@ -25,7 +26,7 @@ export default function TeamAttendanceMonitor() {
   const { dbUserId } = useAuth();
 
   const { data: attendanceRecords = [], isLoading } = useQuery<AttendanceRecord[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/attendance/today`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/attendance/today`],
     enabled: !!dbUserId,
     refetchInterval: 30000, // Refresh every 30 seconds for real-time updates
   });

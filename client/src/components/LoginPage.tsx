@@ -11,6 +11,7 @@ import loginHeroImage from "@assets/stock_images/workspace_desk_lapto_4a3916c9.j
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck } from "lucide-react";
 import MultiStepRegistrationForm from "@/components/MultiStepRegistrationForm";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 export default function LoginPage() {
   const { user, userRole, setUser, setUserRole, setDbUserId, setCompanyId } = useAuth();
@@ -60,7 +61,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch('/api/auth/register-company', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register-company`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(companyRegData),
@@ -99,7 +100,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch('/api/auth/company-admin-login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/company-admin-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(companyAdminData),
@@ -134,7 +135,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch('/api/auth/company-user-login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/company-user-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(companyUserData),

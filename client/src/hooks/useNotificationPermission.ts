@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { isFCMConfigured, requestNotificationPermission } from '@/lib/firebase';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient, API_BASE_URL } from '@/lib/queryClient';
 
 export function useNotificationPermission() {
   const { user } = useAuth();
@@ -21,7 +21,7 @@ export function useNotificationPermission() {
       const token = await requestNotificationPermission();
       
       if (token) {
-        await apiRequest('/api/device-tokens', 'POST', {
+        await apiRequest(`${API_BASE_URL}/api/device-tokens`, 'POST', {
           token,
           deviceType: 'web',
         });

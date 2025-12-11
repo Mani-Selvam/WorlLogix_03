@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import RatingDialog from "@/components/RatingDialog";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 interface TeamMember {
   id: number;
@@ -34,12 +35,12 @@ export default function TeamRatings() {
   const { dbUserId } = useAuth();
 
   const { data: teamMembers = [], isLoading: loadingMembers } = useQuery<TeamMember[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
   });
 
   const { data: allRatings = [], isLoading: loadingRatings } = useQuery<Rating[]>({
-    queryKey: ['/api/ratings'],
+    queryKey: [`${API_BASE_URL}/api/ratings`],
     enabled: !!dbUserId,
   });
 

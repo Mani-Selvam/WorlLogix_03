@@ -10,7 +10,7 @@ import heroImage from "@assets/stock_images/professional_team_co_b1c47478.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useCallback, useState } from "react";
 import type { Task, Message, Rating, GroupMessage, Report } from "@shared/schema";
@@ -36,9 +36,9 @@ export default function UserDashboard() {
   useWebSocket(handleWebSocketMessage);
 
   const { data: tasks = [], isLoading: tasksLoading } = useQuery<Task[]>({
-    queryKey: ['/api/tasks', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/tasks`, dbUserId],
     queryFn: async () => {
-      const res = await fetch(`/api/tasks?userId=${dbUserId}`);
+      const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${dbUserId}`);
       if (!res.ok) throw new Error('Failed to fetch tasks');
       return res.json();
     },
@@ -46,9 +46,9 @@ export default function UserDashboard() {
   });
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
-    queryKey: ['/api/messages', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/messages`, dbUserId],
     queryFn: async () => {
-      const res = await fetch(`/api/messages?receiverId=${dbUserId}`);
+      const res = await fetch(`${API_BASE_URL}/api/messages?receiverId=${dbUserId}`);
       if (!res.ok) throw new Error('Failed to fetch messages');
       return res.json();
     },
@@ -56,9 +56,9 @@ export default function UserDashboard() {
   });
 
   const { data: latestRating, isLoading: ratingLoading } = useQuery<Rating | null>({
-    queryKey: ['/api/ratings', dbUserId, 'latest'],
+    queryKey: [`${API_BASE_URL}/api/ratings`, dbUserId, 'latest'],
     queryFn: async () => {
-      const res = await fetch(`/api/ratings?userId=${dbUserId}&latest=true`);
+      const res = await fetch(`${API_BASE_URL}/api/ratings?userId=${dbUserId}&latest=true`);
       if (!res.ok) throw new Error('Failed to fetch rating');
       return res.json();
     },
@@ -66,9 +66,9 @@ export default function UserDashboard() {
   });
 
   const { data: allRatings = [] } = useQuery<Rating[]>({
-    queryKey: ['/api/ratings', dbUserId, 'all'],
+    queryKey: [`${API_BASE_URL}/api/ratings`, dbUserId, 'all'],
     queryFn: async () => {
-      const res = await fetch(`/api/ratings?userId=${dbUserId}`);
+      const res = await fetch(`${API_BASE_URL}/api/ratings?userId=${dbUserId}`);
       if (!res.ok) throw new Error('Failed to fetch ratings');
       return res.json();
     },
@@ -76,18 +76,18 @@ export default function UserDashboard() {
   });
 
   const { data: groupMessages = [] } = useQuery<GroupMessage[]>({
-    queryKey: ['/api/group-messages'],
+    queryKey: [`${API_BASE_URL}/api/group-messages`],
     queryFn: async () => {
-      const res = await fetch('/api/group-messages?limit=10');
+      const res = await fetch(`${API_BASE_URL}/api/group-messages?limit=10`);
       if (!res.ok) throw new Error('Failed to fetch announcements');
       return res.json();
     },
   });
 
   const { data: userReports = [], isLoading: reportsLoading } = useQuery<Report[]>({
-    queryKey: ['/api/reports', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/reports`, dbUserId],
     queryFn: async () => {
-      const res = await fetch(`/api/reports?userId=${dbUserId}`);
+      const res = await fetch(`${API_BASE_URL}/api/reports?userId=${dbUserId}`);
       if (!res.ok) throw new Error('Failed to fetch reports');
       return res.json();
     },
@@ -96,22 +96,22 @@ export default function UserDashboard() {
 
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: number) => {
-      return await apiRequest(`/api/messages/${messageId}/read`, 'PATCH', {});
+      return await apiRequest(`${API_BASE_URL}/api/messages/${messageId}/read`, 'PATCH', {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/messages', dbUserId] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`, dbUserId] });
     },
   });
 
   const updateTaskStatusMutation = useMutation({
     mutationFn: async ({ taskId, status }: { taskId: number; status: string }) => {
-      return await apiRequest(`/api/tasks/${taskId}/status`, 'PATCH', { status });
+      return await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}/status`, 'PATCH', { status });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['/api/tasks', dbUserId] });
-      await queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      await queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/dashboard/stats'] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`, dbUserId] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
+      await queryClient.refetchQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
     },
   });
 

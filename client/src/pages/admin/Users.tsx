@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import type { User } from "@shared/schema";
@@ -56,17 +56,17 @@ export default function Users() {
   });
 
   const { data: allUsers = [], isLoading: usersLoading } = useQuery<User[]>({
-    queryKey: ['/api/users?includeDeleted=true'],
+    queryKey: [`${API_BASE_URL}/api/users?includeDeleted=true`],
   });
 
   const { data: company } = useQuery<CompanyData>({
-    queryKey: ['/api/my-company'],
+    queryKey: [`${API_BASE_URL}/api/my-company`],
     enabled: !!companyId && !!dbUserId && userRole === 'company_admin',
   });
 
   // Fetch all team assignments to show counts on team leader cards
   const { data: allTeamAssignments = [] } = useQuery<Array<{ teamLeaderId: number; memberId: number }>>({
-    queryKey: ['/api/team-assignments'],
+    queryKey: [`${API_BASE_URL}/api/team-assignments`],
     enabled: userRole === 'company_admin',
   });
 
@@ -82,11 +82,11 @@ export default function Users() {
 
   const toggleUserStatusMutation = useMutation({
     mutationFn: async ({ userId, isActive }: { userId: number; isActive: boolean }) => {
-      return await apiRequest(`/api/users/${userId}/status`, 'PATCH', { isActive });
+      return await apiRequest(`${API_BASE_URL}/api/users/${userId}/status`, 'PATCH', { isActive });
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/users?includeDeleted=true'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/my-company'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/users?includeDeleted=true`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/my-company`] });
       toast({
         title: `User ${variables.isActive ? 'activated' : 'suspended'} successfully`,
         description: `The user has been ${variables.isActive ? 'activated' : 'suspended'}.`,
@@ -103,7 +103,7 @@ export default function Users() {
 
   const createUserMutation = useMutation({
     mutationFn: async (userData: typeof userForm) => {
-      const response = await apiRequest('/api/users', 'POST', userData);
+      const response = await apiRequest(`${API_BASE_URL}/api/users`, 'POST', userData);
       return await response.json() as User;
     },
     onSuccess: (data: User) => {
@@ -116,8 +116,8 @@ export default function Users() {
       setUserForm({ email: "", displayName: "", password: "", role: "company_member" });
       setAddUserDialogOpen(false);
       setCredentialsDialogOpen(true);
-      queryClient.invalidateQueries({ queryKey: ['/api/users?includeDeleted=true'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/my-company'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/users?includeDeleted=true`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/my-company`] });
       
       // If team leader was created, open team assignment dialog
       if (data.role === 'team_leader') {
@@ -139,10 +139,10 @@ export default function Users() {
 
   // Lazy-load team assignments when dialog opens
   const { data: teamAssignments = [], isLoading: teamAssignmentsLoading } = useQuery<User[]>({
-    queryKey: ['/api/team-assignments', selectedTeamLeader?.id, 'members'],
+    queryKey: [`${API_BASE_URL}/api/team-assignments`, selectedTeamLeader?.id, 'members'],
     queryFn: async () => {
       if (!selectedTeamLeader) return [];
-      const response = await fetch(`/api/team-assignments/${selectedTeamLeader.id}/members`);
+      const response = await fetch(`${API_BASE_URL}/api/team-assignments/${selectedTeamLeader.id}/members`);
       if (!response.ok) throw new Error('Failed to fetch team assignments');
       return response.json();
     },
@@ -152,16 +152,16 @@ export default function Users() {
   // Mutation to assign team members
   const assignTeamMembersMutation = useMutation({
     mutationFn: async ({ teamLeaderId, memberIds }: { teamLeaderId: number; memberIds: number[] }) => {
-      return await apiRequest('/api/team-assignments', 'POST', { teamLeaderId, memberIds });
+      return await apiRequest(`${API_BASE_URL}/api/team-assignments`, 'POST', { teamLeaderId, memberIds });
     },
     onSuccess: () => {
       toast({
         title: "Team members assigned successfully",
       });
       setSelectedMemberIds(new Set());
-      queryClient.invalidateQueries({ queryKey: ['/api/team-assignments', selectedTeamLeader?.id, 'members'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/team-assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/users?includeDeleted=true'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`, selectedTeamLeader?.id, 'members'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/users?includeDeleted=true`] });
     },
     onError: (error) => {
       toast({
@@ -175,15 +175,15 @@ export default function Users() {
   // Mutation to remove team member
   const removeTeamMemberMutation = useMutation({
     mutationFn: async ({ teamLeaderId, memberId }: { teamLeaderId: number; memberId: number }) => {
-      return await apiRequest(`/api/team-assignments/${teamLeaderId}/members/${memberId}`, 'DELETE');
+      return await apiRequest(`${API_BASE_URL}/api/team-assignments/${teamLeaderId}/members/${memberId}`, 'DELETE');
     },
     onSuccess: () => {
       toast({
         title: "Team member removed successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/team-assignments', selectedTeamLeader?.id, 'members'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/team-assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/users?includeDeleted=true'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`, selectedTeamLeader?.id, 'members'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/users?includeDeleted=true`] });
     },
     onError: (error) => {
       toast({

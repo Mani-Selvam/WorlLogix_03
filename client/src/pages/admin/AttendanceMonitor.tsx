@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Calendar, Users, Clock, UserCheck, UserX, MoreVertical, History } from "lucide-react";
 import { format } from "date-fns";
 import type { DailyAttendanceRecord, AttendanceRecord } from "@shared/schema";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 
 export default function AttendanceMonitor() {
   const [selectedDate, setSelectedDate] = useState(
@@ -18,7 +19,7 @@ export default function AttendanceMonitor() {
   const [selectedUser, setSelectedUser] = useState<{id: number; name: string; email: string} | null>(null);
 
   const { data: attendanceRecords, isLoading } = useQuery<DailyAttendanceRecord[]>({
-    queryKey: [`/api/admin/attendance/daily?date=${selectedDate}`],
+    queryKey: [`${API_BASE_URL}/api/admin/attendance/daily?date=${selectedDate}`],
   });
 
   const { data: userHistory } = useQuery<{
@@ -26,7 +27,7 @@ export default function AttendanceMonitor() {
     summary: any;
     user: {id: number; displayName: string; email: string};
   }>({
-    queryKey: [`/api/admin/attendance/history/${selectedUser?.id}`],
+    queryKey: [`${API_BASE_URL}/api/admin/attendance/history/${selectedUser?.id}`],
     enabled: !!selectedUser && historyDialogOpen,
   });
 

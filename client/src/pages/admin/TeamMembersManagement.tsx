@@ -8,7 +8,7 @@ import { ArrowLeft, Search, UserMinus, Mail, Loader2, AlertCircle } from "lucide
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import type { User } from "@shared/schema";
@@ -27,27 +27,27 @@ export default function TeamMembersManagement({ params }: TeamMembersManagementP
   const teamLeaderId = parseInt(params.teamLeaderId);
 
   const { data: teamLeader, isLoading: loadingLeader } = useQuery<User>({
-    queryKey: [`/api/users`, teamLeaderId.toString()],
+    queryKey: [`${API_BASE_URL}/api/users`, teamLeaderId.toString()],
     enabled: !!teamLeaderId && userRole === 'company_admin',
   });
 
   const { data: teamMembers = [], isLoading: loadingMembers } = useQuery<User[]>({
-    queryKey: [`/api/team-assignments`, teamLeaderId.toString(), 'members'],
+    queryKey: [`${API_BASE_URL}/api/team-assignments`, teamLeaderId.toString(), 'members'],
     enabled: !!teamLeaderId && userRole === 'company_admin',
   });
 
   const removeTeamMemberMutation = useMutation({
     mutationFn: async (memberId: number) => {
-      return await apiRequest(`/api/team-assignments/${teamLeaderId}/members/${memberId}`, 'DELETE');
+      return await apiRequest(`${API_BASE_URL}/api/team-assignments/${teamLeaderId}/members/${memberId}`, 'DELETE');
     },
     onSuccess: () => {
       toast({
         title: "Success",
         description: "Team member removed successfully. They are now unallocated.",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/team-assignments`, teamLeaderId.toString(), 'members'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/team-assignments'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`, teamLeaderId.toString(), 'members'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/users`] });
     },
     onError: (error) => {
       toast({

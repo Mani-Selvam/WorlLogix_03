@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest , API_BASE_URL} from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,18 +53,18 @@ export default function TeamLeaderMessages() {
 
   // Fetch all messages
   const { data: allMessages = [], isLoading: loadingMessages } = useQuery<Message[]>({
-    queryKey: ['/api/messages'],
+    queryKey: [`${API_BASE_URL}/api/messages`],
     enabled: !!dbUserId,
   });
 
   // Fetch all users to identify roles
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   // Fetch team members assigned to this team leader
   const { data: teamMembers = [] } = useQuery<User[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
     retry: false,
   });
@@ -73,7 +73,7 @@ export default function TeamLeaderMessages() {
     if (data.type === 'NEW_MESSAGE') {
       const messageData = data.data;
       if (messageData.senderId === dbUserId || messageData.receiverId === dbUserId) {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+        queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`] });
         
         if (messageData.receiverId === dbUserId) {
           toast({
@@ -87,10 +87,10 @@ export default function TeamLeaderMessages() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { receiverId: number; message: string; messageType?: string }) => {
-      return await apiRequest('/api/messages', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/messages`, 'POST', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`] });
       setMessageText("");
       toast({
         title: "Success",

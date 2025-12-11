@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Clock, LogIn, LogOut, Calendar, Award, FileText } from "lucide-react";
 import { format } from "date-fns";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import type { AttendanceRecord, Reward } from "@shared/schema";
 
 export default function Attendance() {
@@ -25,22 +25,22 @@ export default function Attendance() {
   }, []);
 
   const { data: todayAttendance, isLoading } = useQuery<AttendanceRecord | null>({
-    queryKey: ["/api/attendance/today"],
+    queryKey: [`${API_BASE_URL}/api/attendance/today`],
   });
 
   const { data: rewards } = useQuery<Reward[]>({
-    queryKey: ["/api/attendance/my-rewards"],
+    queryKey: [`${API_BASE_URL}/api/attendance/my-rewards`],
   });
 
   const checkInMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/attendance/check-in", "POST", {
+      return await apiRequest(`${API_BASE_URL}/api/attendance/check-in`, "POST", {
         gpsLocation: null,
         deviceId: navigator.userAgent,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/today"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
       toast({
         title: "Checked In Successfully",
         description: "Your attendance has been marked for today.",
@@ -57,10 +57,10 @@ export default function Attendance() {
 
   const checkOutMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/attendance/check-out", "POST");
+      return await apiRequest(`${API_BASE_URL}/api/attendance/check-out`, "POST");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/today"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
       toast({
         title: "Checked Out Successfully",
         description: "Your checkout time has been recorded.",
@@ -77,10 +77,10 @@ export default function Attendance() {
 
   const markLeaveMutation = useMutation({
     mutationFn: async (reason: string) => {
-      return await apiRequest("/api/attendance/mark-leave", "POST", { reason });
+      return await apiRequest(`${API_BASE_URL}/api/attendance/mark-leave`, "POST", { reason });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/today"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
       setLeaveDialogOpen(false);
       setLeaveReason("");
       toast({

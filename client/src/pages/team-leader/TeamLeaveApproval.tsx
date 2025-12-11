@@ -5,7 +5,7 @@ import { Check, X, Calendar, User } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,7 +35,7 @@ export default function TeamLeaveApproval() {
 
   const handleWebSocketMessage = useCallback((data: any) => {
     if (data.type === 'LEAVE_STATUS_UPDATE' && data.data.companyId === companyId) {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${companyId}`] });
       const actionBy = data.data.changedBy || data.data.approvedBy || data.data.rejectedBy;
       toast({
         title: "Leave Status Updated",
@@ -47,12 +47,12 @@ export default function TeamLeaveApproval() {
   useWebSocket(handleWebSocketMessage);
 
   const { data: teamMembers = [] } = useQuery<TeamMember[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
   });
 
   const { data: allLeaves = [], isLoading } = useQuery<Leave[]>({
-    queryKey: [`/api/leaves/company/${companyId}`],
+    queryKey: [`${API_BASE_URL}/api/leaves/company/${companyId}`],
     enabled: !!companyId,
   });
 
@@ -64,10 +64,10 @@ export default function TeamLeaveApproval() {
 
   const approveLeave = useMutation({
     mutationFn: async (leaveId: number) => {
-      return apiRequest(`/api/leaves/${leaveId}/approve`, 'PATCH');
+       return apiRequest(`${API_BASE_URL}/api/leaves/${leaveId}/approve`, 'PATCH');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${companyId}`] });
       toast({ title: "Success", description: "Leave request approved" });
     },
     onError: (error: any) => {
@@ -77,10 +77,10 @@ export default function TeamLeaveApproval() {
 
   const rejectLeave = useMutation({
     mutationFn: async (leaveId: number) => {
-      return apiRequest(`/api/leaves/${leaveId}/reject`, 'PATCH');
+       return apiRequest(`${API_BASE_URL}/api/leaves/${leaveId}/reject`, 'PATCH');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${companyId}`] });
       toast({ title: "Success", description: "Leave request rejected" });
     },
     onError: (error: any) => {

@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useToast } from "@/hooks/use-toast";
 import { FileEdit, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import type { CorrectionRequest } from "@shared/schema";
 
 export default function CorrectionRequests() {
@@ -24,7 +24,7 @@ export default function CorrectionRequests() {
   });
 
   const { data: corrections, isLoading } = useQuery<CorrectionRequest[]>({
-    queryKey: ["/api/attendance/my-corrections"],
+    queryKey: [`${API_BASE_URL}/api/attendance/my-corrections`],
   });
 
   const createCorrectionMutation = useMutation({
@@ -36,7 +36,7 @@ export default function CorrectionRequests() {
         ? new Date(`${data.date}T${data.requestedCheckOut}:00`).toISOString()
         : null;
 
-      return await apiRequest("/api/attendance/correction-request", "POST", {
+      return await apiRequest(`${API_BASE_URL}/api/attendance/correction-request`, "POST", {
         date: data.date,
         requestedCheckIn: checkInDateTime,
         requestedCheckOut: checkOutDateTime,
@@ -44,7 +44,7 @@ export default function CorrectionRequests() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/my-corrections"] });
+       queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/my-corrections`] });
       setIsDialogOpen(false);
       setFormData({
         date: "",

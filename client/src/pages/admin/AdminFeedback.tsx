@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, API_BASE_URL } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, User, Shield, Users, Send, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
@@ -18,19 +18,19 @@ export default function AdminFeedback() {
   const [selectedResponses, setSelectedResponses] = useState<Record<number, string>>({});
 
   const { data: feedbacks = [], isLoading } = useQuery<Feedback[]>({
-    queryKey: ['/api/feedbacks'],
+    queryKey: [`${API_BASE_URL}/api/feedbacks`],
   });
 
   const { data: users = [] } = useQuery<UserType[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   const respondMutation = useMutation({
     mutationFn: async ({ feedbackId, adminResponse }: { feedbackId: number; adminResponse: string }) => {
-      return await apiRequest(`/api/feedbacks/${feedbackId}/respond`, 'PATCH', { adminResponse });
+      return await apiRequest(`${API_BASE_URL}/api/feedbacks/${feedbackId}/respond`, 'PATCH', { adminResponse });
     },
     onSuccess: (_data: unknown, variables: { feedbackId: number; adminResponse: string }) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/feedbacks'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/feedbacks`] });
       toast({
         title: "Response sent",
         description: "Your feedback response has been sent successfully",

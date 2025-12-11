@@ -15,7 +15,7 @@ import { Building2, Mail, Phone, MapPin, Users, TrendingUp, Calendar, Edit, Load
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { format } from "date-fns";
 
 interface CompanyProfile {
@@ -104,7 +104,7 @@ export default function CompanyProfile() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const { data: company, isLoading } = useQuery<CompanyProfile>({
-    queryKey: ['/api/my-company/profile'],
+    queryKey: [`${API_BASE_URL}/api/my-company/profile`],
     enabled: !!dbUserId,
   });
 
@@ -161,10 +161,10 @@ export default function CompanyProfile() {
         employees: parseInt(data.employees),
         yearEstablished: parseInt(data.yearEstablished),
       };
-      return await apiRequest('/api/my-company/profile', 'PATCH', payload);
+      return await apiRequest(`${API_BASE_URL}/api/my-company/profile`, 'PATCH', payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/my-company/profile'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/my-company/profile`] });
       toast({
         title: "Success",
         description: "✅ Company details updated successfully!",

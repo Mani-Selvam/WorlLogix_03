@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 interface TeamMemberStat {
   id: number;
@@ -63,7 +64,7 @@ export default function TeamAttendanceReports() {
   const { startDate, endDate } = getDateRange(period);
 
   const { data: reportData, isLoading } = useQuery<AttendanceReportData>({
-    queryKey: [`/api/team-assignments/${dbUserId}/attendance/reports`, { startDate, endDate }],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/attendance/reports`, { startDate, endDate }],
     enabled: !!dbUserId,
   });
 

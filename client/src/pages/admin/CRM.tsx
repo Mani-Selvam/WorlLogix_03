@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, API_BASE_URL } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,24 +73,24 @@ export default function CRM() {
   const { toast } = useToast();
 
   const { data: stats } = useQuery<CRMStats>({
-    queryKey: ["/api/crm/stats"],
+    queryKey: [`${API_BASE_URL}/api/crm/stats`],
   });
 
   const { data: enquiries = [] } = useQuery<Enquiry[]>({
-    queryKey: ["/api/crm/enquiries"],
+    queryKey: [`${API_BASE_URL}/api/crm/enquiries`],
   });
 
   const { data: followups = [] } = useQuery<Followup[]>({
-    queryKey: ["/api/crm/followups"],
+    queryKey: [`${API_BASE_URL}/api/crm/followups`],
   });
 
   const createEnquiryMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/crm/enquiries", "POST", data);
+      return await apiRequest(`${API_BASE_URL}/api/crm/enquiries`, "POST", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/enquiries"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/stats"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/enquiries`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/stats`] });
       toast({ title: "Enquiry created successfully" });
       setSelectedEnquiry(null);
       setEnquiryFormKey(prev => prev + 1);
@@ -100,11 +100,11 @@ export default function CRM() {
 
   const updateEnquiryMutation = useMutation({
     mutationFn: async ({ id, ...data }: any) => {
-      return await apiRequest(`/api/crm/enquiries/${id}`, "PATCH", data);
+      return await apiRequest(`${API_BASE_URL}/api/crm/enquiries/${id}`, "PATCH", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/enquiries"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/stats"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/enquiries`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/stats`] });
       toast({ title: "Enquiry updated successfully" });
       setSelectedEnquiry(null);
       setCurrentSection(1);
@@ -113,45 +113,45 @@ export default function CRM() {
 
   const deleteEnquiryMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/crm/enquiries/${id}`, "DELETE");
+      return await apiRequest(`${API_BASE_URL}/api/crm/enquiries/${id}`, "DELETE");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/enquiries"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/stats"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/enquiries`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/stats`] });
       toast({ title: "Enquiry deleted successfully" });
     },
   });
 
   const markAsWonMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/crm/enquiries/${id}`, "PATCH", { status: "sales_closed" });
+      return await apiRequest(`${API_BASE_URL}/api/crm/enquiries/${id}`, "PATCH", { status: "sales_closed" });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/enquiries"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/stats"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/enquiries`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/stats`] });
       toast({ title: "Enquiry marked as Won!", description: "Sales closed successfully" });
     },
   });
 
   const markAsLostMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/crm/enquiries/${id}`, "PATCH", { status: "dropped" });
+      return await apiRequest(`${API_BASE_URL}/api/crm/enquiries/${id}`, "PATCH", { status: "dropped" });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/enquiries"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/stats"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/enquiries`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/stats`] });
       toast({ title: "Enquiry marked as Lost", description: "Moved to dropped status" });
     },
   });
 
   const createFollowupMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/crm/followups", "POST", data);
+      return await apiRequest(`${API_BASE_URL}/api/crm/followups`, "POST", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/followups"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/enquiries"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/stats"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/followups`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/enquiries`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/crm/stats`] });
       toast({ title: "Followup created successfully" });
       setSelectedEnquiryForFollowup(null);
       setFollowupFormKey(prev => prev + 1);

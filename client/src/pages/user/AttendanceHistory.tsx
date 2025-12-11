@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, LogIn, LogOut } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from "date-fns";
 import type { AttendanceRecord } from "@shared/schema";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -31,15 +32,15 @@ export default function AttendanceHistory() {
   const endDate = format(endOfMonth(new Date(selectedYear, selectedMonth)), "yyyy-MM-dd");
 
   const { data: user } = useQuery<{ id: number; companyId: number | null }>({ 
-    queryKey: ['/api/me'] 
+    queryKey: [`${API_BASE_URL}/api/me`] 
   });
 
   const { data: attendanceRecords, isLoading } = useQuery<AttendanceRecord[]>({
-    queryKey: ["/api/attendance/history", { startDate, endDate }],
+    queryKey: [`${API_BASE_URL}/api/attendance/history`, { startDate, endDate }],
   });
 
   const { data: holidays = [] } = useQuery<Holiday[]>({
-    queryKey: [`/api/holidays/company/${user?.companyId}`],
+    queryKey: [`${API_BASE_URL}/api/holidays/company/${user?.companyId}`],
     enabled: !!user?.companyId,
   });
 
@@ -51,7 +52,7 @@ export default function AttendanceHistory() {
     leave: number;
     halfDay: number;
   }>({
-    queryKey: ["/api/attendance/monthly-summary", { month: selectedMonth + 1, year: selectedYear }],
+    queryKey: [`${API_BASE_URL}/api/attendance/monthly-summary`, { month: selectedMonth + 1, year: selectedYear }],
   });
 
   const daysInMonth = eachDayOfInterval({

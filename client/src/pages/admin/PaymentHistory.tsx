@@ -14,12 +14,13 @@ import { Download, Receipt, Mail, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import type { CompanyPayment } from "@shared/schema";
 import { useAuth } from "@/contexts/AuthContext";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function PaymentHistory() {
   const { dbUserId } = useAuth();
 
   const { data: payments = [], isLoading } = useQuery<CompanyPayment[]>({
-    queryKey: ['/api/my-company-payments'],
+    queryKey: [`${API_BASE_URL}/api/my-company-payments`],
     enabled: !!dbUserId,
   });
 

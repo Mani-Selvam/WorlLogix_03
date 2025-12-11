@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, API_BASE_URL } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,8 +73,8 @@ export default function Tasks() {
             }));
           }
           // Invalidate queries to force refetch
-          queryClient.invalidateQueries({ queryKey: ['/api/tasks', dbUserId] });
-          queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+          queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`, dbUserId] });
+          queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
         }
       } catch (error) {
         console.error('[WebSocket] Error parsing message:', error);
@@ -101,7 +101,7 @@ export default function Tasks() {
   }, [completedTaskIds]);
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
-    queryKey: ['/api/tasks', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/tasks`, dbUserId],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
@@ -110,7 +110,7 @@ export default function Tasks() {
         headers["x-user-id"] = userId.toString();
       }
       
-      const res = await fetch(`/api/tasks?userId=${dbUserId}`, { headers, credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/tasks?userId=${dbUserId}`, { headers, credentials: "include" });
       if (!res.ok) throw new Error('Failed to fetch tasks');
       return res.json();
     },
@@ -152,7 +152,7 @@ export default function Tasks() {
       const timer = timerStates[taskId];
       console.log('Completing task:', taskId);
       
-      await apiRequest(`/api/tasks/${taskId}/timer/complete`, 'POST', {
+      await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}/timer/complete`, 'POST', {
         userId: dbUserId,
         date: new Date().toISOString().split('T')[0],
         duration: timer?.elapsed || 0
@@ -161,14 +161,14 @@ export default function Tasks() {
       
       // Use the status endpoint to update task status
       console.log('Updating status for task:', taskId);
-      await apiRequest(`/api/tasks/${taskId}/status`, 'PATCH', {
+      await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}/status`, 'PATCH', {
         status: 'completed'
       });
       console.log('Status updated');
       
       // Invalidate queries to refresh data
-      await queryClient.invalidateQueries({ queryKey: ['/api/tasks', dbUserId] });
-      await queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`, dbUserId] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
       console.log('Queries invalidated');
       
       const newCompleted = new Set(completedTaskIds);

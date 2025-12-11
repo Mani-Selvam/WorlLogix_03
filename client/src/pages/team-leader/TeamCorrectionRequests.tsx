@@ -5,7 +5,7 @@ import { Check, X, Clock, User } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,12 +35,12 @@ export default function TeamCorrectionRequests() {
   const [statusFilter, setStatusFilter] = useState<string>("pending");
 
   const { data: teamMembers = [] } = useQuery<TeamMember[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
   });
 
   const { data: teamCorrections = [], isLoading } = useQuery<CorrectionRequest[]>({
-    queryKey: [`/api/corrections/team/${dbUserId}`],
+    queryKey: [`${API_BASE_URL}/api/corrections/team/${dbUserId}`],
     enabled: !!dbUserId,
   });
 
@@ -50,10 +50,10 @@ export default function TeamCorrectionRequests() {
 
   const approveCorrection = useMutation({
     mutationFn: async (correctionId: number) => {
-      return apiRequest(`/api/corrections/${correctionId}/approve`, 'PATCH');
+      return apiRequest(`${API_BASE_URL}/api/corrections/${correctionId}/approve`, 'PATCH');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/corrections/team/${dbUserId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/corrections/team/${dbUserId}`] });
       toast({ title: "Success", description: "Correction request approved" });
     },
     onError: (error: any) => {
@@ -63,10 +63,10 @@ export default function TeamCorrectionRequests() {
 
   const rejectCorrection = useMutation({
     mutationFn: async (correctionId: number) => {
-      return apiRequest(`/api/corrections/${correctionId}/reject`, 'PATCH');
+      return apiRequest(`${API_BASE_URL}/api/corrections/${correctionId}/reject`, 'PATCH');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/corrections/team/${dbUserId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/corrections/team/${dbUserId}`] });
       toast({ title: "Success", description: "Correction request rejected" });
     },
     onError: (error: any) => {

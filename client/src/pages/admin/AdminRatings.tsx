@@ -9,14 +9,15 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Rating, User } from "@shared/schema";
 import RatingDialog from "@/components/RatingDialog";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 
 export default function AdminRatings() {
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   const { data: allRatings = [] } = useQuery<Rating[]>({
-    queryKey: ['/api/ratings'],
+    queryKey: [`${API_BASE_URL}/api/ratings`],
   });
 
   const employees = users.filter(u => u.role === 'team_leader' || u.role === 'company_member');

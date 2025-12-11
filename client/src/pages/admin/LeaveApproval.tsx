@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Clock, Check, X } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,12 +15,12 @@ export default function LeaveApproval() {
   const { toast } = useToast();
 
   const { data: user } = useQuery<any>({
-    queryKey: ['/api/me'],
+    queryKey: [`${API_BASE_URL}/api/me`],
   });
 
   const handleWebSocketMessage = useCallback((data: any) => {
     if (data.type === 'LEAVE_STATUS_UPDATE' && data.data.companyId === user?.companyId) {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${user?.companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${user?.companyId}`] });
       const actionBy = data.data.changedBy || data.data.approvedBy || data.data.rejectedBy;
       toast({
         title: "Leave Status Updated",
@@ -32,16 +32,16 @@ export default function LeaveApproval() {
   useWebSocket(handleWebSocketMessage);
 
   const { data: leaves = [], isLoading } = useQuery<LeaveWithUser[]>({
-    queryKey: [`/api/leaves/company/${user?.companyId}`],
+    queryKey: [`${API_BASE_URL}/api/leaves/company/${user?.companyId}`],
     enabled: !!user?.companyId,
   });
 
   const approveMutation = useMutation({
     mutationFn: async (leaveId: number) => {
-      return await apiRequest(`/api/leaves/${leaveId}/approve`, 'PATCH', {});
+      return await apiRequest(`${API_BASE_URL}/api/leaves/${leaveId}/approve`, 'PATCH', {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${user?.companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${user?.companyId}`] });
       toast({
         title: "Leave approved",
         description: "The leave request has been approved successfully.",
@@ -58,10 +58,10 @@ export default function LeaveApproval() {
 
   const rejectMutation = useMutation({
     mutationFn: async (leaveId: number) => {
-      return await apiRequest(`/api/leaves/${leaveId}/reject`, 'PATCH', {});
+      return await apiRequest(`${API_BASE_URL}/api/leaves/${leaveId}/reject`, 'PATCH', {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${user?.companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${user?.companyId}`] });
       toast({
         title: "Leave rejected",
         description: "The leave request has been rejected.",
@@ -78,10 +78,10 @@ export default function LeaveApproval() {
 
   const changeStatusMutation = useMutation({
     mutationFn: async ({ leaveId, status }: { leaveId: number; status: string }) => {
-      return await apiRequest(`/api/leaves/${leaveId}/status`, 'PATCH', { status });
+      return await apiRequest(`${API_BASE_URL}/api/leaves/${leaveId}/status`, 'PATCH', { status });
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/leaves/company/${user?.companyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/company/${user?.companyId}`] });
       toast({
         title: "Status updated",
         description: `Leave status changed to ${variables.status}`,

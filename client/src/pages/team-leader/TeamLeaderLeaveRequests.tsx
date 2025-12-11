@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Calendar, Clock } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useState } from "react";
 import type { Leave } from "@shared/schema";
 
@@ -29,7 +29,7 @@ export default function TeamLeaderLeaveRequests() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: leaves = [], isLoading } = useQuery<Leave[]>({
-    queryKey: ['/api/leaves/me'],
+    queryKey: [`${API_BASE_URL}/api/leaves/me`],
   });
 
   const form = useForm<LeaveFormData>({
@@ -44,10 +44,10 @@ export default function TeamLeaderLeaveRequests() {
 
   const createLeaveMutation = useMutation({
     mutationFn: async (data: LeaveFormData) => {
-      return await apiRequest('/api/leaves', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/leaves`, 'POST', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/leaves/me'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/leaves/me`] });
       toast({
         title: "Leave request submitted",
         description: "Your leave request has been submitted for approval.",

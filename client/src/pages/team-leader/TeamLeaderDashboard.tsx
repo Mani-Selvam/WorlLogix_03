@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 interface TeamMember {
   id: number;
@@ -53,27 +54,27 @@ export default function TeamLeaderDashboard() {
   const { user, dbUserId, companyId } = useAuth();
 
   const { data: teamMembers = [], isLoading: loadingMembers } = useQuery<TeamMember[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
   });
 
   const { data: allTasks = [], isLoading: loadingTasks } = useQuery<Task[]>({
-    queryKey: ['/api/tasks'],
+    queryKey: [`${API_BASE_URL}/api/tasks`],
     enabled: !!companyId,
   });
 
   const { data: allLeaves = [], isLoading: loadingLeaves } = useQuery<Leave[]>({
-    queryKey: [`/api/leaves/company/${companyId}`],
+    queryKey: [`${API_BASE_URL}/api/leaves/company/${companyId}`],
     enabled: !!companyId,
   });
 
   const { data: todayAttendance = [] } = useQuery<AttendanceRecord[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/attendance/today`],
+    queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/attendance/today`],
     enabled: !!dbUserId,
   });
 
   const { data: groupMessages = [] } = useQuery<GroupMessage[]>({
-    queryKey: ['/api/group-messages'],
+    queryKey: [`${API_BASE_URL}/api/group-messages`],
     enabled: !!companyId,
   });
 

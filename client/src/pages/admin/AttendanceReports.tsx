@@ -23,6 +23,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 
 export default function AttendanceReports() {
   const [dateRange, setDateRange] = useState("7");
@@ -92,7 +93,7 @@ export default function AttendanceReports() {
       attendanceRate: number;
     }>;
   }>({
-    queryKey: ["/api/admin/attendance/reports", { startDate, endDate, type: "summary" }],
+    queryKey: [`${API_BASE_URL}/api/admin/attendance/reports`, { startDate, endDate, type: "summary" }],
     enabled: !!startDate && !!endDate && (dateRange !== "custom" || (!!customStartDate && !!customEndDate)),
   });
 

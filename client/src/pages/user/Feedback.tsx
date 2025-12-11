@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { MessageSquare, User, Shield, Users } from "lucide-react";
 import type { Feedback } from "@shared/schema";
 
@@ -18,7 +18,7 @@ export default function Feedback() {
   const { dbUserId } = useAuth();
 
   const { data: submittedFeedbacks = [], isLoading: loadingFeedbacks } = useQuery<Feedback[]>({
-    queryKey: ['/api/feedbacks', 'my-feedbacks', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/feedbacks?submittedBy=${dbUserId}`],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
@@ -27,7 +27,7 @@ export default function Feedback() {
         headers["x-user-id"] = userId.toString();
       }
       
-      const res = await fetch(`/api/feedbacks?submittedBy=${dbUserId}`, { headers, credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/feedbacks?submittedBy=${dbUserId}`, { headers, credentials: "include" });
       if (!res.ok) throw new Error('Failed to fetch feedbacks');
       return res.json();
     },
@@ -36,7 +36,7 @@ export default function Feedback() {
 
   const submitFeedbackMutation = useMutation({
     mutationFn: async (data: { message: string; recipientType: string }) => {
-      return await apiRequest('/api/feedbacks', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/feedbacks`, 'POST', data);
     },
     onSuccess: () => {
       toast({
@@ -44,8 +44,8 @@ export default function Feedback() {
         description: `Your feedback has been submitted to ${recipientType === "Admin" ? "Admin" : "Team Leader"}`,
       });
       setMessage("");
-      queryClient.invalidateQueries({ queryKey: ['/api/feedbacks'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/feedbacks', 'my-feedbacks', dbUserId] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/feedbacks`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/feedbacks?submittedBy=${dbUserId}`] });
     },
     onError: (error) => {
       toast({

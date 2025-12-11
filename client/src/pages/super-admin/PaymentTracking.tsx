@@ -28,6 +28,7 @@ import {
 import { CalendarIcon, Download } from "lucide-react";
 import { format } from "date-fns";
 import type { CompanyPayment } from "@shared/schema";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 
 export default function PaymentTracking() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -44,9 +45,9 @@ export default function PaymentTracking() {
   }
 
   const { data: payments = [], isLoading, error } = useQuery<CompanyPayment[]>({
-    queryKey: ['/api/super-admin/payments', queryParams.toString()],
+    queryKey: [`${API_BASE_URL}/api/super-admin/payments`, queryParams.toString()],
     queryFn: async () => {
-      const res = await fetch(`/api/super-admin/payments?${queryParams}`, {
+      const res = await fetch(`${API_BASE_URL}/api/super-admin/payments?${queryParams}`, {
         headers: { 'x-user-id': localStorage.getItem('userId') || '' }
       });
       if (!res.ok) {

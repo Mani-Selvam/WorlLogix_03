@@ -31,7 +31,7 @@ import {
     AlertCircle,
 } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, API_BASE_URL } from "@/lib/queryClient";
 
 const registrationSchema = z
     .object({
@@ -101,7 +101,7 @@ export default function CompanyRegistration() {
     useEffect(() => {
         const checkConfig = async () => {
             try {
-                const res = await fetch("/api/config");
+                const res = await fetch(`${API_BASE_URL}/api/config`);
                 const config = await res.json();
                 setGoogleOAuthEnabled(config.googleOAuthEnabled || false);
             } catch (error) {
@@ -156,7 +156,7 @@ export default function CompanyRegistration() {
     };
 
     const handleGoogleSignIn = () => {
-        window.location.href = "/api/auth/google";
+        window.location.href = `${API_BASE_URL}/api/auth/google`;
     };
 
     if (registrationSuccess && serverIdInfo) {

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { ArrowLeft, Building2 } from "lucide-react";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 export default function ForgotCompanyIdPage() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export default function ForgotCompanyIdPage() {
     setError("");
 
     try {
-      const response = await fetch('/api/auth/forgot-company-id', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-company-id`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

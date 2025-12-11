@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, CheckCircle2, ListTodo, Star, Building2 } from "lucide-react";
 import { useTaskUpdates } from "@/hooks/useTaskUpdates";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 interface CompanyData {
   id: number;
@@ -19,7 +20,7 @@ export default function Overview() {
   const { dbUserId, companyId } = useAuth();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['/api/user/stats', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/dashboard/stats`],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
@@ -28,9 +29,9 @@ export default function Overview() {
         headers["x-user-id"] = userId.toString();
       }
       
-      const tasks = await fetch(`/api/tasks?userId=${dbUserId}`, { headers, credentials: "include" }).then(r => r.json());
-      const reports = await fetch(`/api/reports?userId=${dbUserId}`, { headers, credentials: "include" }).then(r => r.json());
-      const ratings = await fetch(`/api/ratings?userId=${dbUserId}`, { headers, credentials: "include" }).then(r => r.json());
+      const tasks = await fetch(`${API_BASE_URL}/api/tasks?userId=${dbUserId}`, { headers, credentials: "include" }).then(r => r.json());
+      const reports = await fetch(`${API_BASE_URL}/api/reports?userId=${dbUserId}`, { headers, credentials: "include" }).then(r => r.json());
+      const ratings = await fetch(`${API_BASE_URL}/api/ratings?userId=${dbUserId}`, { headers, credentials: "include" }).then(r => r.json());
       
       return {
         totalTasks: tasks.length,
@@ -43,7 +44,7 @@ export default function Overview() {
   });
 
   const { data: company } = useQuery<CompanyData>({
-    queryKey: ['/api/my-company'],
+    queryKey: [`${API_BASE_URL}/api/my-company`],
     enabled: !!companyId && !!dbUserId,
   });
 

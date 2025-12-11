@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useTaskUpdates } from "@/hooks/useTaskUpdates";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -108,8 +108,8 @@ export default function TeamTasks() {
             }));
           }
           // Invalidate queries to force refetch
-          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-          queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+          queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+          queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
         }
       } catch (error) {
         console.error('[WebSocket] Error parsing message:', error);
@@ -136,12 +136,12 @@ export default function TeamTasks() {
   }, [completedTaskIds]);
 
   const { data: teamMembers = [] } = useQuery<TeamMember[]>({
-    queryKey: [`/api/team-assignments/${dbUserId}/members`],
+   queryKey: [`${API_BASE_URL}/api/team-assignments/${dbUserId}/members`],
     enabled: !!dbUserId,
   });
 
   const { data: allTasks = [], isLoading } = useQuery<Task[]>({
-    queryKey: ['/api/tasks'],
+    queryKey: [`${API_BASE_URL}/api/tasks`],
   });
 
   const teamMemberIds = teamMembers.map(m => m.id);
@@ -150,10 +150,10 @@ export default function TeamTasks() {
 
   const createTaskMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/tasks', 'POST', { ...data, assignedBy: dbUserId });
+      return apiRequest(`${API_BASE_URL}/api/tasks`, 'POST', { ...data, assignedBy: dbUserId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
       setIsCreateOpen(false);
       resetForm();
       toast({ title: "Success", description: "Task created successfully" });
@@ -165,10 +165,10 @@ export default function TeamTasks() {
 
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, ...data }: any) => {
-      return apiRequest(`/api/tasks/${id}`, 'PATCH', data);
+      return apiRequest(`${API_BASE_URL}/api/tasks/${id}`, 'PATCH', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
       setIsEditOpen(false);
       setSelectedTask(null);
       toast({ title: "Success", description: "Task updated successfully" });
@@ -180,10 +180,10 @@ export default function TeamTasks() {
 
   const deleteTaskMutation = useMutation({
     mutationFn: async (taskId: number) => {
-      return apiRequest(`/api/tasks/${taskId}`, 'DELETE');
+      return apiRequest(`${API_BASE_URL}/api/tasks/${taskId}`, 'DELETE');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
       toast({ title: "Success", description: "Task deleted successfully" });
     },
     onError: (error: any) => {
@@ -297,7 +297,7 @@ export default function TeamTasks() {
       const timer = timerStates[taskId];
       console.log('Completing task:', taskId);
       
-      await apiRequest(`/api/tasks/${taskId}/timer/complete`, 'POST', {
+      await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}/timer/complete`, 'POST', {
         userId: dbUserId,
         date: new Date().toISOString().split('T')[0],
         duration: timer?.elapsed || 0
@@ -306,14 +306,14 @@ export default function TeamTasks() {
       
       // Use the status endpoint to update task status
       console.log('Updating status for task:', taskId);
-      await apiRequest(`/api/tasks/${taskId}/status`, 'PATCH', {
+      await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}/status`, 'PATCH', {
         status: 'completed'
       });
       console.log('Status updated');
       
       // Invalidate queries to refresh data
-      await queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      await queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+      await queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
       console.log('Queries invalidated');
       
       const newCompleted = new Set(completedTaskIds);

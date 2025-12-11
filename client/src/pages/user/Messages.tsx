@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, API_BASE_URL } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,14 +50,14 @@ export default function Messages() {
   const [showConversationList, setShowConversationList] = useState(true);
 
   const { data: allMessages = [], isLoading: loadingMessages } = useQuery<Message[]>({
-    queryKey: ['/api/messages'],
+    queryKey: [`${API_BASE_URL}/api/messages`, dbUserId],
     enabled: !!dbUserId,
   });
 
   const { data: teamLeaderInfo, isLoading: loadingLeader } = useQuery<TeamLeader | null>({
-    queryKey: ['/api/team-leader/me'],
+    queryKey: [`${API_BASE_URL}/api/team-leader/me`],
     queryFn: async () => {
-      const res = await fetch('/api/team-leader/me', {
+      const res = await fetch(`${API_BASE_URL}/api/team-leader/me`, {
         credentials: "include",
         headers: {
           'x-user-id': dbUserId?.toString() || '',
@@ -87,7 +87,7 @@ export default function Messages() {
       const messageData = data.data;
 
       if (messageData.senderId === dbUserId || messageData.receiverId === dbUserId) {
-        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+        queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`, dbUserId] });
 
         if (messageData.receiverId === dbUserId) {
           toast({
@@ -101,10 +101,10 @@ export default function Messages() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { receiverId: number; message: string }) => {
-      return await apiRequest('/api/messages', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/messages`, 'POST', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`, dbUserId] });
       setMessageText("");
       toast({
         title: "Success",

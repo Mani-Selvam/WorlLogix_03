@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Calendar, Trash2 } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useState } from "react";
 import type { Holiday } from "@shared/schema";
 
@@ -27,11 +27,11 @@ export default function HolidayManagement() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: user } = useQuery<any>({
-    queryKey: ['/api/me'],
+    queryKey: [`${API_BASE_URL}/api/me`],
   });
 
   const { data: holidays = [], isLoading } = useQuery<Holiday[]>({
-    queryKey: ['/api/holidays/company', user?.companyId],
+    queryKey: [`${API_BASE_URL}/api/holidays/company`, user?.companyId],
     enabled: !!user?.companyId,
   });
 
@@ -46,10 +46,10 @@ export default function HolidayManagement() {
 
   const createHolidayMutation = useMutation({
     mutationFn: async (data: HolidayFormData) => {
-      return await apiRequest('/api/holidays', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/holidays`, 'POST', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/holidays/company', user?.companyId] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/holidays/company`, user?.companyId] });
       toast({
         title: "Holiday added",
         description: "The holiday has been added successfully.",
@@ -68,10 +68,10 @@ export default function HolidayManagement() {
 
   const deleteHolidayMutation = useMutation({
     mutationFn: async (holidayId: number) => {
-      return await apiRequest(`/api/holidays/${holidayId}`, 'DELETE', {});
+      return await apiRequest(`${API_BASE_URL}/api/holidays/${holidayId}`, 'DELETE', {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/holidays/company', user?.companyId] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/holidays/company`, user?.companyId] });
       toast({
         title: "Holiday deleted",
         description: "The holiday has been removed successfully.",

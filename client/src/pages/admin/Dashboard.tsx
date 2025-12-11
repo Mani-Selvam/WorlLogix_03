@@ -17,7 +17,7 @@ import { Users, FileText, CheckCircle, FolderOpen, Plus, MessageSquare, Building
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTaskUpdates } from "@/hooks/useTaskUpdates";
 import { useState } from "react";
@@ -52,35 +52,35 @@ export default function Dashboard() {
     totalFiles: number;
     pendingCompletedTasks?: number;
   }>({
-    queryKey: ['/api/dashboard/stats'],
+    queryKey: [`${API_BASE_URL}/api/dashboard/stats`],
   });
 
   const { data: company } = useQuery<CompanyData>({
-    queryKey: ['/api/my-company'],
+    queryKey: [`${API_BASE_URL}/api/my-company`],
     enabled: !!companyId && !!dbUserId && !isSuperAdmin,
   });
 
   const { data: slotPricing } = useQuery<SlotPricing[]>({
-    queryKey: ['/api/slot-pricing'],
+    queryKey: [`${API_BASE_URL}/api/slot-pricing`],
     enabled: isSuperAdmin,
   });
 
   const { data: allCompanies } = useQuery<Company[]>({
-    queryKey: ['/api/companies'],
+    queryKey: [`${API_BASE_URL}/api/companies`],
     enabled: isSuperAdmin,
   });
 
   const { data: allPayments } = useQuery<CompanyPayment[]>({
-    queryKey: ['/api/company-payments'],
+    queryKey: [`${API_BASE_URL}/api/company-payments`],
     enabled: isSuperAdmin,
   });
 
   const updatePricingMutation = useMutation({
     mutationFn: async (data: { slotType: string; pricePerSlot: number; currency: string }) => {
-      return await apiRequest('/api/slot-pricing', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/slot-pricing`, 'POST', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/slot-pricing'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/slot-pricing`] });
       toast({ title: "Success", description: "Pricing updated successfully" });
       setEditingPricing(null);
     },
@@ -91,21 +91,21 @@ export default function Dashboard() {
 
   const deleteCompanyMutation = useMutation({
     mutationFn: async (companyId: number) => {
-      return await apiRequest(`/api/companies/${companyId}`, 'DELETE');
+      return await apiRequest(`${API_BASE_URL}/api/companies/${companyId}`, 'DELETE');
     },
     onMutate: async (companyId: number) => {
-      await queryClient.cancelQueries({ queryKey: ['/api/companies'] });
+      await queryClient.cancelQueries({ queryKey: [`${API_BASE_URL}/api/companies`] });
       
-      const previousCompanies = queryClient.getQueryData<Company[]>(['/api/companies']);
+      const previousCompanies = queryClient.getQueryData<Company[]>([`${API_BASE_URL}/api/companies`]);
       
-      queryClient.setQueryData<Company[]>(['/api/companies'], (old) => 
+      queryClient.setQueryData<Company[]>([`${API_BASE_URL}/api/companies`], (old) => 
         old ? old.filter(c => c.id !== companyId) : []
       );
       
       return { previousCompanies };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/companies`] });
       toast({ 
         title: "Success", 
         description: "Company removed successfully" 
@@ -115,7 +115,7 @@ export default function Dashboard() {
     },
     onError: (error: any, companyId, context) => {
       if (context?.previousCompanies) {
-        queryClient.setQueryData(['/api/companies'], context.previousCompanies);
+        queryClient.setQueryData([`${API_BASE_URL}/api/companies`], context.previousCompanies);
       }
       toast({ 
         title: "Error", 

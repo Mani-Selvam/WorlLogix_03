@@ -7,6 +7,7 @@ import { PasswordStrengthMeter } from "@/components/ui/password-strength-meter";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { KeyRound, CheckCircle2 } from "lucide-react";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 export default function ResetPasswordPage() {
   const [, setLocation] = useLocation();
@@ -51,7 +52,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword: password }),

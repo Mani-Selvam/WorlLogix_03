@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import type { Report, User } from "@shared/schema";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 
 export default function AdminReports() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,16 +18,16 @@ export default function AdminReports() {
   const [dateFilter, setDateFilter] = useState({ startDate: "", endDate: "" });
 
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   const { data: reports = [], isLoading: reportsLoading } = useQuery<Report[]>({
-    queryKey: ['/api/reports', dateFilter.startDate, dateFilter.endDate],
+    queryKey: [`${API_BASE_URL}/api/reports`, dateFilter.startDate, dateFilter.endDate],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
       
-      let url = '/api/reports';
+      let url = `${API_BASE_URL}/api/reports`;
       const params = new URLSearchParams();
       if (dateFilter.startDate) params.append('startDate', dateFilter.startDate);
       if (dateFilter.endDate) params.append('endDate', dateFilter.endDate);

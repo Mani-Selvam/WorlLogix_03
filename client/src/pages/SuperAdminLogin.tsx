@@ -13,6 +13,7 @@ import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 export default function SuperAdminLogin() {
     const { user, userRole, setUser, setUserRole, setDbUserId, setCompanyId } =
@@ -44,7 +45,7 @@ export default function SuperAdminLogin() {
         setIsLoading(true);
         setError("");
         try {
-            const response = await fetch("/api/auth/super-admin-login", {
+            const response = await fetch(`${API_BASE_URL}/api/auth/super-admin-login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(superAdminData),

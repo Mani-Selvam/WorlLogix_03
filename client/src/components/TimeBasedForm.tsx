@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Sunrise, Moon, Upload, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface TimeBasedFormProps {
@@ -41,7 +41,7 @@ export default function TimeBasedForm({
                 notes: data.notes || null,
             };
 
-            return await apiRequest("/api/reports", "POST", reportData);
+            return await apiRequest(`${API_BASE_URL}/api/reports`, "POST", reportData);
         },
         onSuccess: () => {
             toast({
@@ -55,7 +55,7 @@ export default function TimeBasedForm({
                 notes: "",
                 screenshot: null,
             });
-            queryClient.invalidateQueries({ queryKey: ["/api/reports"] });
+            queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/reports`] });
         },
         onError: (error) => {
             toast({

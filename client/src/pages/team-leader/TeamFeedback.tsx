@@ -18,7 +18,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface Feedback {
@@ -40,7 +40,7 @@ export default function TeamFeedback() {
   const [recipientType, setRecipientType] = useState<"Admin" | "TeamLeader">("Admin");
 
   const { data: teamFeedbackList = [], isLoading: loadingFeedbacks } = useQuery<Feedback[]>({
-    queryKey: [`/api/feedbacks`],
+    queryKey: [`${API_BASE_URL}/api/feedbacks`],
     enabled: !!companyId,
   });
 
@@ -91,7 +91,7 @@ export default function TeamFeedback() {
 
   const submitFeedbackMutation = useMutation({
     mutationFn: async (data: { message: string; recipientType: string }) => {
-      return await apiRequest('/api/feedbacks', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/feedbacks`, 'POST', data);
     },
     onSuccess: () => {
       toast({
@@ -100,7 +100,7 @@ export default function TeamFeedback() {
       });
       setFeedbackMessage("");
       setIsSubmitDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/feedbacks'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/feedbacks`] });
     },
     onError: (error: any) => {
       toast({

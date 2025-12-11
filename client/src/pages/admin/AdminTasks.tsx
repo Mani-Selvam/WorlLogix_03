@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Plus, ListTodo, UserCheck, MoreVertical, Edit, Trash2, Undo2, Eye } from "lucide-react";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
@@ -37,7 +37,7 @@ export default function AdminTasks() {
   const handleViewTaskDetails = async (task: Task) => {
     setSelectedTaskForDetails(task);
     try {
-      const response = await apiRequest(`/api/tasks/${task.id}/details`, 'GET');
+      const response = await apiRequest(`${API_BASE_URL}/api/tasks/${task.id}/details`, 'GET');
       setTaskDetailsData(response);
       setTaskDetailsOpen(true);
     } catch (error) {
@@ -57,15 +57,15 @@ export default function AdminTasks() {
   };
 
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   const { data: allTasks = [], isLoading: tasksLoading } = useQuery<Task[]>({
-    queryKey: ['/api/tasks'],
+    queryKey: [`${API_BASE_URL}/api/tasks`],
   });
 
   const { data: myTasks = [], isLoading: myTasksLoading } = useQuery<Task[]>({
-    queryKey: [`/api/tasks?assignedBy=${dbUserId}`],
+    queryKey: [`${API_BASE_URL}/api/tasks?assignedBy=${dbUserId}`],
     enabled: !!dbUserId,
   });
 
@@ -80,7 +80,7 @@ export default function AdminTasks() {
         deadline: safeConvertToISO(taskData.deadline),
         status: "pending",
       };
-      return await apiRequest('/api/tasks', 'POST', payload);
+      return await apiRequest(`${API_BASE_URL}/api/tasks`, 'POST', payload);
     },
     onSuccess: () => {
       toast({
@@ -89,9 +89,9 @@ export default function AdminTasks() {
       });
       setTaskDialogOpen(false);
       setTaskForm({ title: "", description: "", assignedTo: "", priority: "medium", deadline: "" });
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/tasks?assignedBy=${dbUserId}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks?assignedBy=${dbUserId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
     },
     onError: (error) => {
       toast({
@@ -111,7 +111,7 @@ export default function AdminTasks() {
         priority: taskData.priority,
         deadline: safeConvertToISO(taskData.deadline),
       };
-      return await apiRequest(`/api/tasks/${taskId}`, 'PATCH', payload);
+      return await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}`, 'PATCH', payload);
     },
     onSuccess: () => {
       toast({
@@ -120,8 +120,8 @@ export default function AdminTasks() {
       setTaskDialogOpen(false);
       setEditingTask(null);
       setTaskForm({ title: "", description: "", assignedTo: "", priority: "medium", deadline: "" });
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/tasks?assignedBy=${dbUserId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks?assignedBy=${dbUserId}`] });
     },
     onError: (error) => {
       toast({
@@ -134,14 +134,14 @@ export default function AdminTasks() {
 
   const deleteTaskMutation = useMutation({
     mutationFn: async (taskId: number) => {
-      return await apiRequest(`/api/tasks/${taskId}`, 'DELETE');
+      return await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}`, 'DELETE');
     },
     onSuccess: () => {
       toast({
         title: "Task deleted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/tasks?assignedBy=${dbUserId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks?assignedBy=${dbUserId}`] });
     },
     onError: (error) => {
       toast({
@@ -154,14 +154,14 @@ export default function AdminTasks() {
 
   const returnTaskMutation = useMutation({
     mutationFn: async (taskId: number) => {
-      return await apiRequest(`/api/tasks/${taskId}`, 'PATCH', { status: 'pending' });
+      return await apiRequest(`${API_BASE_URL}/api/tasks/${taskId}`, 'PATCH', { status: 'pending' });
     },
     onSuccess: () => {
       toast({
         title: "Task returned to pending",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/tasks?assignedBy=${dbUserId}`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks?assignedBy=${dbUserId}`] });
     },
     onError: (error) => {
       toast({

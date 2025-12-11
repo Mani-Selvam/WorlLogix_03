@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest , queryClient, API_BASE_URL} from "@/lib/queryClient";
 
 export default function EmailVerification() {
     const [, setLocation] = useLocation();
@@ -32,7 +32,7 @@ export default function EmailVerification() {
 
             try {
                 const res = await apiRequest(
-                    `/api/auth/verify-company?token=${token}`,
+                    `${API_BASE_URL}/api/auth/verify-company?token=${token}`,
                     "GET"
                 );
                 const response = await res.json();

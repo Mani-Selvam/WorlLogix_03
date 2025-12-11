@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface RatingDialogProps {
@@ -40,15 +40,15 @@ export default function RatingDialog({ userId, userName, trigger, onSuccess }: R
 
   const submitRatingMutation = useMutation({
     mutationFn: async (data: { userId: number; rating: string; period: string; feedback?: string }) => {
-      return await apiRequest('/api/ratings', 'POST', data);
+      return await apiRequest(`${API_BASE_URL}/api/ratings`, 'POST', data);
     },
     onSuccess: () => {
       // Invalidate all rating-related queries
-      queryClient.invalidateQueries({ queryKey: ['/api/ratings'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/ratings`] });
       // Invalidate team assignment queries (for team leader dashboards)
-      queryClient.invalidateQueries({ queryKey: ['/api/team-assignments'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/team-assignments`] });
       // Invalidate messages (since a notification is sent)
-      queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`] });
       toast({
         title: "Rating submitted",
         description: `Successfully rated ${userName}`,

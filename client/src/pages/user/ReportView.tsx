@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import type { Report } from "@shared/schema";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 export default function ReportView() {
   const { dbUserId } = useAuth();
 
   const { data: reports = [], isLoading } = useQuery<Report[]>({
-    queryKey: ['/api/reports', dbUserId],
+    queryKey: [`${API_BASE_URL}/api/reports`, dbUserId],
     queryFn: async () => {
       const user = localStorage.getItem('user');
       const userId = user ? JSON.parse(user).id : null;
@@ -18,7 +19,7 @@ export default function ReportView() {
         headers["x-user-id"] = userId.toString();
       }
       
-      const res = await fetch(`/api/reports?userId=${dbUserId}`, { headers, credentials: "include" });
+      const res = await fetch(`${API_BASE_URL}/api/reports?userId=${dbUserId}`, { headers, credentials: "include" });
       if (!res.ok) throw new Error('Failed to fetch reports');
       return res.json();
     },

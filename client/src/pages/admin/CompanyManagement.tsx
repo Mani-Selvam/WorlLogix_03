@@ -10,11 +10,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, Users, UserCog, Plus, Save, ShoppingCart, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { SlotPricing } from "@shared/schema";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import StripeCheckoutForm from "@/components/StripeCheckoutForm";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 
 interface CompanyData {
   id: number;
@@ -42,20 +42,20 @@ export default function CompanyManagement() {
   const [paymentId, setPaymentId] = useState<number | null>(null);
 
   const { data: company, isLoading } = useQuery<CompanyData>({
-    queryKey: ['/api/my-company'],
+    queryKey: [`${API_BASE_URL}/api/my-company`],
     enabled: !!dbUserId,
   });
 
   const { data: slotPricing } = useQuery<SlotPricing[]>({
-    queryKey: ['/api/slot-pricing'],
+    queryKey: [`${API_BASE_URL}/api/slot-pricing`],
   });
 
   const updateCompanyMutation = useMutation({
     mutationFn: async (updates: { name?: string; maxAdmins?: number; maxMembers?: number }) => {
-      return await apiRequest('/api/my-company', 'PATCH', updates);
+      return await apiRequest(`${API_BASE_URL}/api/my-company`, 'PATCH', updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/my-company'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/my-company`] });
       toast({
         title: "Success",
         description: "Company settings updated successfully",
@@ -74,7 +74,7 @@ export default function CompanyManagement() {
   const createPaymentIntentMutation = useMutation({
     mutationFn: async (data: { slotType: 'admin' | 'member'; quantity: number }) => {
       setPaymentStatus('creating');
-      const response = await apiRequest('/api/create-payment-intent', 'POST', data);
+      const response = await apiRequest(`${API_BASE_URL}/api/create-payment-intent`, 'POST', data);
       return await response.json();
     },
     onSuccess: (data: any) => {
@@ -101,13 +101,13 @@ export default function CompanyManagement() {
 
   const verifyPaymentMutation = useMutation({
     mutationFn: async (paymentIntentId: string) => {
-      const response = await apiRequest('/api/verify-payment', 'POST', { paymentIntentId, paymentId });
+      const response = await apiRequest(`${API_BASE_URL}/api/verify-payment`, 'POST', { paymentIntentId, paymentId });
       return await response.json();
     },
     onSuccess: (data: any) => {
       setPaymentStatus('success');
-      queryClient.invalidateQueries({ queryKey: ['/api/my-company'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/my-company-payments'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/my-company`] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/my-company-payments`] });
       
       const emailStatus = data.emailSent ? "✅ Receipt emailed to your company email" : "⚠️ Email sending in progress";
       

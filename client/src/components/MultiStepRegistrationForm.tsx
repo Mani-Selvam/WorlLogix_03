@@ -10,6 +10,7 @@ import { PasswordStrengthMeter } from "@/components/ui/password-strength-meter";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { ArrowLeft, ArrowRight, Building2, MapPin, Briefcase, UserCheck } from "lucide-react";
+import { API_BASE_URL } from "@/lib/queryClient";
 
 interface FormData {
   fullName: string;
@@ -207,7 +208,7 @@ export default function MultiStepRegistrationForm() {
         yearEstablished: parseInt(formData.yearEstablished),
       };
       
-      const response = await fetch('/api/auth/register-company', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register-company`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),

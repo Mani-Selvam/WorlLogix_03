@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { queryClient } from '@/lib/queryClient';
+import { queryClient, API_BASE_URL } from '@/lib/queryClient';
 
 export function useTaskUpdates() {
   useEffect(() => {
@@ -16,8 +16,8 @@ export function useTaskUpdates() {
         if (message.type === 'task_updated' || message.type === 'task_deleted') {
           console.log('[WebSocket] Task update received:', message.type);
           // Invalidate tasks query to force refetch
-          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-          queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+          queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/tasks`] });
+          queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/dashboard/stats`] });
         }
       } catch (error) {
         console.error('[WebSocket] Error parsing message:', error);

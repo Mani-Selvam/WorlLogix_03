@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Settings, Clock, MapPin, Smartphone, Save } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, API_BASE_URL } from "@/lib/queryClient";
 import type { AttendancePolicy } from "@shared/schema";
 
 export default function AttendancePolicy() {
@@ -23,7 +23,7 @@ export default function AttendancePolicy() {
   });
 
   const { data: policy, isLoading } = useQuery<AttendancePolicy>({
-    queryKey: ["/api/admin/attendance-policy"],
+    queryKey: [`${API_BASE_URL}/api/admin/attendance-policy`],
   });
 
   useEffect(() => {
@@ -42,10 +42,10 @@ export default function AttendancePolicy() {
 
   const updatePolicyMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest("/api/admin/attendance-policy", "POST", data);
+      return await apiRequest(`${API_BASE_URL}/api/admin/attendance-policy`, "POST", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/attendance-policy"] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/admin/attendance-policy`] });
       toast({
         title: "Policy Updated",
         description: "Attendance policy has been successfully updated.",

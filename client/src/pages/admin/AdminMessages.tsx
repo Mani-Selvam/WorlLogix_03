@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient ,API_BASE_URL} from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWebSocket } from "@/contexts/WebSocketContext";
@@ -41,24 +41,24 @@ export default function AdminMessages() {
   const [showConversationList, setShowConversationList] = useState(true);
 
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: [`${API_BASE_URL}/api/users`],
   });
 
   const { data: privateMessages = [] } = useQuery<Message[]>({
-    queryKey: ['/api/messages'],
+    queryKey: [`${API_BASE_URL}/api/messages`],
   });
 
   const { data: groupMessages = [] } = useQuery<GroupMessage[]>({
-    queryKey: ['/api/group-messages'],
+    queryKey: [`${API_BASE_URL}/api/group-messages`],
   });
 
   // Real-time updates
   useWebSocket((data) => {
     if (data.type === 'NEW_MESSAGE') {
-      queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`] });
     }
     if (data.type === 'NEW_GROUP_MESSAGE') {
-      queryClient.invalidateQueries({ queryKey: ['/api/group-messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/group-messages`] });
     }
   });
 
@@ -146,7 +146,7 @@ export default function AdminMessages() {
         messageType = 'admin_to_employee';
       }
 
-      return await apiRequest('/api/messages', 'POST', {
+      return await apiRequest(`${API_BASE_URL}/api/messages`, 'POST', {
         senderId: dbUserId,
         receiverId,
         message,
@@ -156,7 +156,7 @@ export default function AdminMessages() {
     },
     onSuccess: () => {
       setMessageInput("");
-      queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/messages`] });
     },
     onError: (error) => {
       toast({
@@ -169,14 +169,14 @@ export default function AdminMessages() {
 
   const sendGroupMessageMutation = useMutation({
     mutationFn: async ({ message }: { message: string }) => {
-      return await apiRequest('/api/group-messages', 'POST', {
+      return await apiRequest(`${API_BASE_URL}/api/group-messages`, 'POST', {
         message,
         title: null,
       });
     },
     onSuccess: () => {
       setMessageInput("");
-      queryClient.invalidateQueries({ queryKey: ['/api/group-messages'] });
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/group-messages`] });
     },
     onError: (error) => {
       toast({
