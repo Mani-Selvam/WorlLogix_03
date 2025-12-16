@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
     }
 
     return {
-        base: "./",
+        base: isProduction ? "/worklogix/" : "/",
         define: {
             "import.meta.env.VITE_API_URL": JSON.stringify(apiUrl),
         },
@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
         },
         root: path.resolve(import.meta.dirname, "client"),
         build: {
-            outDir: path.resolve(import.meta.dirname, "dist", "public"),
+            outDir: path.resolve(import.meta.dirname, "dist"),
             emptyOutDir: true,
         },
         server: {
