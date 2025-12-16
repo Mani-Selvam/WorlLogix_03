@@ -1,6 +1,7 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /worklogix/
+  #Base path for the application
+  RewriteBase /worklogix/ 
   
   # Don't rewrite files or directories that exist
   RewriteCond %{REQUEST_FILENAME} !-f
