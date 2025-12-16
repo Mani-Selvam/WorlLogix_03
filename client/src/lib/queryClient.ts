@@ -1,13 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 // API base URL - uses environment variable for external server, otherwise relative path
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
-// Helper to build full API URL
+export const API_BASE_URL =
+    import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
+
 export function getApiUrl(path: string): string {
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-        return path;
-    }
+    if (path.startsWith("http")) return path;
     return `${API_BASE_URL}${path}`;
 }
 
@@ -20,7 +19,7 @@ async function throwIfResNotOk(res: Response) {
                 const errorData = JSON.parse(text);
                 if (errorData.code === "USER_INACTIVE") {
                     localStorage.clear();
-                    window.location.href = "/";
+                    window.location.href = "/worklogix/";
                     throw new Error(
                         "Your account has been disabled. You have been logged out."
                     );

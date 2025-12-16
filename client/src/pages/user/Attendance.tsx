@@ -25,11 +25,11 @@ export default function Attendance() {
   }, []);
 
   const { data: todayAttendance, isLoading } = useQuery<AttendanceRecord | null>({
-    queryKey: [`${API_BASE_URL}/api/attendance/today`],
+    queryKey: ["/api/attendance/today"],
   });
 
   const { data: rewards } = useQuery<Reward[]>({
-    queryKey: [`${API_BASE_URL}/api/attendance/my-rewards`],
+    queryKey: ["/api/attendance/my-rewards"],
   });
 
   const checkInMutation = useMutation({
@@ -40,7 +40,7 @@ export default function Attendance() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/today"] });
       toast({
         title: "Checked In Successfully",
         description: "Your attendance has been marked for today.",
@@ -60,7 +60,7 @@ export default function Attendance() {
       return await apiRequest(`${API_BASE_URL}/api/attendance/check-out`, "POST");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/today"] });
       toast({
         title: "Checked Out Successfully",
         description: "Your checkout time has been recorded.",
@@ -80,7 +80,7 @@ export default function Attendance() {
       return await apiRequest(`${API_BASE_URL}/api/attendance/mark-leave`, "POST", { reason });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/attendance/today`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/today"] });
       setLeaveDialogOpen(false);
       setLeaveReason("");
       toast({

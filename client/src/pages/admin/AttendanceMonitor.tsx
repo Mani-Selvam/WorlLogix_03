@@ -19,7 +19,7 @@ export default function AttendanceMonitor() {
   const [selectedUser, setSelectedUser] = useState<{id: number; name: string; email: string} | null>(null);
 
   const { data: attendanceRecords, isLoading } = useQuery<DailyAttendanceRecord[]>({
-    queryKey: [`${API_BASE_URL}/api/admin/attendance/daily?date=${selectedDate}`],
+    queryKey: [`/api/admin/attendance/daily?date=${selectedDate}`],
   });
 
   const { data: userHistory } = useQuery<{
@@ -27,7 +27,7 @@ export default function AttendanceMonitor() {
     summary: any;
     user: {id: number; displayName: string; email: string};
   }>({
-    queryKey: [`${API_BASE_URL}/api/admin/attendance/history/${selectedUser?.id}`],
+    queryKey: [`/api/admin/attendance/history/${selectedUser?.id}`],
     enabled: !!selectedUser && historyDialogOpen,
   });
 

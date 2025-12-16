@@ -18,11 +18,11 @@ export default function AdminFeedback() {
   const [selectedResponses, setSelectedResponses] = useState<Record<number, string>>({});
 
   const { data: feedbacks = [], isLoading } = useQuery<Feedback[]>({
-    queryKey: [`${API_BASE_URL}/api/feedbacks`],
+    queryKey: ["/api/feedbacks"],
   });
 
   const { data: users = [] } = useQuery<UserType[]>({
-    queryKey: [`${API_BASE_URL}/api/users`],
+    queryKey: ["/api/users"],
   });
 
   const respondMutation = useMutation({
@@ -30,7 +30,7 @@ export default function AdminFeedback() {
       return await apiRequest(`${API_BASE_URL}/api/feedbacks/${feedbackId}/respond`, 'PATCH', { adminResponse });
     },
     onSuccess: (_data: unknown, variables: { feedbackId: number; adminResponse: string }) => {
-      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/feedbacks`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/feedbacks"] });
       toast({
         title: "Response sent",
         description: "Your feedback response has been sent successfully",

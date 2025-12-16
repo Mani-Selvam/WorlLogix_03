@@ -218,7 +218,7 @@ export default function CompanyRegistration() {
                         </div>
 
                         <Button
-                            onClick={() => setLocation("/login/admin")}
+                            onClick={() => setLocation("login/admin")}
                             className="w-full bg-indigo-600 hover:bg-indigo-700"
                             data-testid="button-go-to-login">
                             Go to Login
@@ -445,7 +445,7 @@ export default function CompanyRegistration() {
                     <div className="text-center text-sm text-gray-600 dark:text-gray-400">
                         Already have an account?{" "}
                         <a
-                            href="/login/admin"
+                            href="login/admin"
                             className="text-indigo-600 hover:underline font-medium"
                             data-testid="link-login">
                             Login here

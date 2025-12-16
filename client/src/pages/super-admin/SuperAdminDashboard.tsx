@@ -106,12 +106,12 @@ export default function SuperAdminDashboard() {
 
     const { data: companiesWithStats = [], isLoading: loadingCompanies } =
         useQuery<CompanyWithStats[]>({
-            queryKey: [`${API_BASE_URL}/api/super-admin/companies-with-stats`],
+            queryKey: ["/api/super-admin/companies-with-stats"],
         });
 
     const { data: analytics, isLoading: loadingAnalytics } =
         useQuery<AnalyticsData>({
-            queryKey: [`${API_BASE_URL}/api/super-admin/analytics`],
+            queryKey: ["/api/super-admin/analytics"],
         });
 
     const suspendMutation = useMutation({
@@ -122,12 +122,10 @@ export default function SuperAdminDashboard() {
             ),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: [
-                    `${API_BASE_URL}/api/super-admin/companies-with-stats`,
-                ],
+                queryKey: ["/api/super-admin/companies-with-stats"],
             });
             queryClient.invalidateQueries({
-                queryKey: [`${API_BASE_URL}/api/super-admin/analytics`],
+                queryKey: ["/api/super-admin/analytics"],
             });
             toast({
                 title: "Success",
@@ -151,12 +149,10 @@ export default function SuperAdminDashboard() {
             ),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: [
-                    `${API_BASE_URL}/api/super-admin/companies-with-stats`,
-                ],
+                queryKey: ["/api/super-admin/companies-with-stats"],
             });
             queryClient.invalidateQueries({
-                queryKey: [`${API_BASE_URL}/api/super-admin/analytics`],
+                queryKey: ["/api/super-admin/analytics"],
             });
             toast({
                 title: "Success",
@@ -177,12 +173,10 @@ export default function SuperAdminDashboard() {
             apiRequest(`${API_BASE_URL}/api/companies/${companyId}`, "DELETE"),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: [
-                    `${API_BASE_URL}/api/super-admin/companies-with-stats`,
-                ],
+                queryKey: ["/api/super-admin/companies-with-stats"],
             });
             queryClient.invalidateQueries({
-                queryKey: [`${API_BASE_URL}/api/super-admin/analytics`],
+                queryKey: ["/api/super-admin/analytics"],
             });
             setShowDeleteDialog(false);
             setSelectedCompany(null);
