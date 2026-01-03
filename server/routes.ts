@@ -395,13 +395,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             // Determine the correct frontend URL for verification emails
             let baseUrl: string;
-            
+
             // Priority 1: Replit domains (development and production)
             if (process.env.REPLIT_DEV_DOMAIN) {
                 baseUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
             } else if (process.env.REPLIT_DOMAINS) {
                 // REPLIT_DOMAINS can be comma-separated, take the first one
-                const domains = process.env.REPLIT_DOMAINS.split(',');
+                const domains = process.env.REPLIT_DOMAINS.split(",");
                 baseUrl = `https://${domains[0].trim()}`;
             }
             // Priority 2: Use Origin or Referer header from the request
@@ -417,12 +417,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             // Priority 4: Fall back to request headers
             else {
-                const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
-                const host = req.headers["x-forwarded-host"] || req.headers.host;
+                const protocol =
+                    req.headers["x-forwarded-proto"] || req.protocol || "https";
+                const host =
+                    req.headers["x-forwarded-host"] || req.headers.host;
                 baseUrl = `${protocol}://${host}`;
             }
-            
-            console.log(`[REGISTRATION] Using base URL for verification email: ${baseUrl}`);
+
+            console.log(
+                `[REGISTRATION] Using base URL for verification email: ${baseUrl}`
+            );
 
             await sendCompanyVerificationEmail({
                 companyName: validatedData.companyName,
